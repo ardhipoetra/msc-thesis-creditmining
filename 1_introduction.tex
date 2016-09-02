@@ -1,7 +1,39 @@
 \chapter{Introduction}
 \label{chp:introduction}
 
-\todo[inline]{The introduction}
+
+%in bittorrent -> peer as social user
+%
+% the performance of file-sharing in p2p system
+% cooperation important to keep swarm alive -> swarm evolution
+%
+%private trackers sometime force user to donating with SRE -> cite Chen, 2014
+%this resulting poor download motivation for users although its for greater goods
+%
+%in the other hand, public tracker have much less SLR compared to private (has its own problem)
+%
+% cms do here
+%
+%tribler user -> many -> donate -> swarm 
+
+Interaction among user in the Internet community can be expressed in various fashion. Peer-to-peer (P2P) is one of the major interaction existed in the net\todo{p2p owned the internet}. Many applications and protocols run on top of P2P system, online gaming, computing, and the most popular one, file sharing. \bt~is by far the most popular system used in file-sharing community with it's unique \textit{tit-for-tat} mechanism to discourage freeriding \cite{2003:bittorrent:cohen}. 
+
+In higher abstraction level, it is common to see P2P system, specifically in \bt, as social networking. Many social challenges addressed in this kind of network such as incentives mechanism, economical value to survive in the community, reputation identification, and user anonymity\todo{cite here and there about those study}. All of those challenges involves peer behavior whether to help each other for the greater goods, selfishly consume all the resource without giving back, or inconsistently act between these two. Based on \todo{cite, peer behavior}, lots of P2P peers are always show self-interest and rationality. It can be interpreted as maximizing their benefits and giving as little as possible. \textit{Freeriding} is the term given to this kind of behavior. It is often to describe this peer as \textit{freeriders}.
+
+In \bt~system, cooperation between peers is very important to keep a file available in the network. With more user provides the file, the download speed gained for other user will be increased as well. However, this needs user enthusiasm for providing the file regardless of its needs. For both public and private communities, the number of seeder become an issue that made a swarm unhealthy \cite{2010:pubpriv:meulpolder, 2014:sustainabilitytorrent:chen}. With freeriders join the swarm, naturally it will reduce the overall performance. Furthermore, when freeriders become majority, the swarm is as good as dead \todo{cite this, I read this somewhere}. 
+
+%example of solution
+% This problem is commonly addressed as prisoner's dilemma \todo{prisoner dilemma citation}.
+Several researches already provide solution to prevent uncooperative peer behavior\todo{cite here and there}, all to produce higher downloading throughput on downloader. Most of them focused their work on the incentives for peer or alteration of the currency system itself. Tribler for example, working on a MultiChain \cite{2015:multichain:norberhuis} as a secure and accountable currency in P2P system. \todo{another client address freeriding, incentive, etc} This thesis work is more general and applicable as an another spectrum hoping to solve this problem. 
+
+%what this thesis do
+%credit mining tries to solve, 
+%design, implement, evaluate. also with normal downloading
+In this thesis, we introduce ``Credit mining system (CMS)'', an automatic investment framework on swarm with multidimensional gain. The first phase of the framework was conducted by \citeauthor{2015:creditmining:capota}, mainly to operate CMS without any restriction or coordination with any client. With CMS, locally, a user can gain credit with internal limited bandwidth allocation without any intervention needed. The credit can be in many forms such as share ratio (upload-to-download ratio), uploaded amount, effort based credit, and many other. From higher perpective, CMS will help a swarm to keep alive by providing integral pieces to peer who need it. Although CMS will be implemented in Tribler system, it is possible to implement this feature to any system on top of \bt~ network.
+
+Tribler is one of the P2P file sharing software developed in Delft University of Technology that addressing social issues in \bt~network\cite{2008:tribler:pouwelse}. With Tribler downloaded from official repository on the latest stable release (6.5.2) reaching  78440\footnote{\url{http://www.somsubhra.com/github-release-stats/ ?username=tribler&repository=tribler} (Accessed 3 September 2016)} times, it is desired to observe the usage of CMS with adequate user base. We believe our work will be able to increase the overall swarm throughput by donating unused bandwidth on peer upstream.
+
+
 
 \section{Document Structure}
-This thesis is structured as follows. Chapter 2 provides problem description and answer to tackle this issue. Chapter 3 discusses related work to the problem and solution proposed. Chapter 4 presents the design of credit mining system integrated with Tribler. Implementation of the system and it's experiment will be elaborated in chapter 5. Chapter 6 shows result of the performance of credit mining system. At the end, chapter 7 concludes the work mentioning possible future work.
+This thesis is structured as follows. Chapter 2 provides problem description and answer to tackle this issue. Chapter 3 discusses related work to the problem and solution proposed. Chapter 4 presents the design of credit mining system integrated with Tribler. Implementation of the mechanism and it's experiment will be elaborated in chapter 5. Chapter 6 shows performance of credit mining system. At the end, chapter 7 concludes the work mentioning possible future work.
