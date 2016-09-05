@@ -2,24 +2,24 @@
 \label{chp:relwork}
 
 \section{BitTorrent}
-BitTorrent \cite{2003:bittorrent:cohen} is a file distributed system on top of peer-to-peer network. Static \texttt{.torrent} file, which contains information such as tracker addresses and unique hash value of this swarm, is created by peer who want to publish their files. \textit{Tracker} responsible for monitors the distribution and progress of file and peers in a swarm. Peer uses information in \texttt{.torrent} file to connect each other.
+\bt~\cite{2003:bittorrent:cohen} is a file distributed system on top of peer-to-peer network. Static \texttt{.torrent} file, which contains information such as tracker addresses and unique hash value of this swarm, is created by peer who want to publish their files. \textit{Tracker} responsible for monitors the distribution and progress of file and peers in a swarm. Peer uses information in \texttt{.torrent} file to connect each other.
 
 % tit-for-tat, choking, unchoke, optimistic unchoke
 \todo{cite cheating peers/freeloader/hit-n-run behavior}
 \todo{cite choke/unchoke algorithm}
-In BitTorrent, it is desirable to have many peers upload piece of file to the swarm. This way, swarm can be \textit{healthier} and overall download speed can increase. However, many peers become a \textit{leecher}, which quits the swarm when his download finished. BitTorrent uses \textit{tit-for-tat} mechanism to reward good behavior and punish bad behavior. To force cooperation of other peer, BitTorrent implement \textit{choking algorithm}. Choking algorithm is an algorithm to temporarily refuse uploading piece of file to a particular peer. Usually, an uploader has limited number of unchoked slots. By observing other peers, choking algorithm decide which peer a particular piece will be sent or not sent to. If we unchoke a peer, it means we consider to upload a piece to that peer. For starters, it is usually useful to execute \textit{optimistic unchoking}. Optimistic unchoking is an algorithm to unchoke a peer regardless of its activity in a swarm. This gives a peer chance to increase his upload rate by providing more content.
+In \bt, it is desirable to have many peers upload piece of file to the swarm. This way, swarm can be \textit{healthier} and overall download speed can increase. However, many peers become a \textit{leecher}, which quits the swarm when his download finished. \bt~uses \textit{tit-for-tat} mechanism to reward good behavior and punish bad behavior. To force cooperation of other peer, \bt~ implement \textit{choking algorithm}. Choking algorithm is an algorithm to temporarily refuse uploading piece of file to a particular peer. Usually, an uploader has limited number of unchoked slots. By observing other peers, choking algorithm decide which peer a particular piece will be sent or not sent to. If we unchoke a peer, it means we consider to upload a piece to that peer. For starters, it is usually useful to execute \textit{optimistic unchoking}. Optimistic unchoking is an algorithm to unchoke a peer regardless of its activity in a swarm. This gives a peer chance to increase his upload rate by providing more content.
 
 % peer discovery DHT, PEX, LSD
 \subsection{Peer Discovery}
 \todo{LSD? (bep\_0014.html)}
-One of the integral part in BitTorrent protocol is peer discovery. With a large number of known peers, the algorithm will have more option on which peer to unchoke. State of the swarm itself often represented by the peer belong to that swarm. In BitTorrent, there are four method to discover new or update peer. 
+One of the integral part in \bt~protocol is peer discovery. With a large number of known peers, the algorithm will have more option on which peer to unchoke. State of the swarm itself often represented by the peer belong to that swarm. In \bt, there are four method to discover new or update peer. 
 
 \subsubsection{Tracker Peer Announce}
-In original design of BitTorrent, it uses tracker to allow peer discover each other \cite{2003:bittorrent:cohen}. Tracker tend to use random and limited list of peers. Peer contact tracker periodically to expand their peer dictionary. This act of requesting peer to tracker is called \textit{announce}.	Usually, most tracker has a policy about recommended interval when to recontact for getting new peers. Violate this policy can result a particular peer blocked.
+In original design of \bt, it uses tracker to allow peer discover each other \cite{2003:bittorrent:cohen}. Tracker tend to use random and limited list of peers. Peer contact tracker periodically to expand their peer dictionary. This act of requesting peer to tracker is called \textit{announce}.	Usually, most tracker has a policy about recommended interval when to recontact for getting new peers. Violate this policy can result a particular peer blocked.
 
 \subsubsection{Distributed Hash Table (DHT)}
 \todo{DHT performance?}
-Originally, peer need to contact tracker to fetch new peer address and file information. This makes BitTorrent very dependent on centralized system which vulnerable to single point of failure. In 2008, Distributed Hash Table (DHT) is proposed \cite{2008:DHT:loewenstern}. Towards a ``trackerless'' BitTorrent system, DHT allow each peer to become a tracker. DHT stores peer contact information with defined key-space as ``node ID''. Each peer stored other peer's node ID and its address in their own routing table. A ``distance'' is measured on two node ID to define how close those two. ``Distance'' also can be measured between infohash of a torrent and node ID.
+Originally, peer need to contact tracker to fetch new peer address and file information. This makes \bt~very dependent on centralized system which vulnerable to single point of failure. In 2008, Distributed Hash Table (DHT) is proposed \cite{2008:dht:loewenstern}. Towards a ``trackerless'' \bt~system, DHT allow each peer to become a tracker. DHT stores peer contact information with defined key-space as ``node ID''. Each peer stored other peer's node ID and its address in their own routing table. A ``distance'' is measured on two node ID to define how close those two. ``Distance'' also can be measured between infohash of a torrent and node ID.
 
 To enrich its peer dictionary, a node can compare a torrent's infohash and node ID in its routing table. If the distance under the threshold, it contacts that node to ask the information of the swarm, which includes the peer list. If contacted node do not know this torrent, it will respond with another node in its table which closest to the provided infohash.
 
@@ -28,14 +28,14 @@ To increase the chance of getting higher downloading speed, having up to date pe
 
 
 \section{Tribler}
-Tribler\footnote{\url{https://www.tribler.org/}} is peer-to-peer file sharing application that compatible with BitTorrent protocol \cite{2008:tribler:pouwelse}. Tribler focused on security, fully decentralized system, and anonymity. Starts with ABC (Another BitTorrent Client), Tribler currently provides content discovery, channels concept, and reputation management in fully distributed manner.
+Tribler\footnote{\url{https://www.tribler.org/}} is peer-to-peer file sharing application that compatible with \bt~protocol \cite{2008:tribler:pouwelse}. Tribler focused on security, fully decentralized system, and anonymity. Starts with ABC (Another \bt~Client), Tribler currently provides content discovery, channels concept, and reputation management in fully distributed manner.
 
 \todo{What information to include?\\-anonymous\\-end2end encryption}
 
 \subsection{Dispersy Community}
 \todo{Various community}
 \todo{Relation on peers}
-See table \ref{tbl:community}
+See table \ref{tbl:community}.
 
 \begin{table}[tbp]
 	\centering
@@ -59,7 +59,7 @@ See table \ref{tbl:community}
 \subsection{Share Mode}
 
 \section{Credit Mining Framework}
-Credit mining base \cite{2015:creditmining:capota}.\\ Investment strategy in regression model \cite{2013:investmentcm:capota}. \\Use libtorrent as helper. Multiple helper and its effect to swarm with actual downloading on the other side \cite{2014:bwmarket:capota}.
+Credit mining base \cite{2015:creditmining:capota}.\\ Investment strategy in regression model \cite{2013:investmentcm:capota}. \\Use libtorrent as helper. Multiple helper and its effect to swarm with actual downloading on the other side \cite{2014:bwmarket:capota}. actual improvement! shift bottleneck and seed efficiently. Use trace to 
 
 Inter swarm resource allocation \cite{2011:interswarm:mihai}.
 

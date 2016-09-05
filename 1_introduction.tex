@@ -34,6 +34,55 @@ In this thesis, we introduce ``Credit mining system (CMS)'', an automatic invest
 Tribler is one of the P2P file sharing software developed in Delft University of Technology that addressing social issues in \bt~network\cite{2008:tribler:pouwelse}. With Tribler downloaded from official repository on the latest stable release (6.5.2) reaching  78440\footnote{\url{http://www.somsubhra.com/github-release-stats/ ?username=tribler&repository=tribler} (Accessed 3 September 2016)} times, it is desired to observe the usage of CMS with adequate user base. We believe our work will be able to increase the overall swarm throughput by donating unused bandwidth on peer upstream.
 
 
+%
+Credit (share ratio or upload rate) is needed especially in private tracker. In this case, BitTorrent tit-for-tat is irrelevant \cite{2010:pubpriv:meulpolder}
+
+
+
+
+\section{Peer-to-peer networks}
+In this section we will discuss several aspects of peer-to-peer (P2P) networks. \todo{Structure of this section}
+
+
+
+P2p in social aspect
+freeriding
+prisoner dilemma -> reduce througput
+
+private tracker/community solve lack of initiative -> incentivize
+
+different p2p app (file transfer, vod, game), have different requirement
+
+flashcrowd -> sudden increase in net -> unstable peer. supply demand misalignments -> non heavy tail
+
+% some to increase throughput
+smart cloud seeding -> mix download from cloud and p2p. Analysis on which swarm/file to help
+
+% problem: p2p social community is good if all peer is considerable, otherwise, it sucks.bittorrent pattern flashcrowd : many S/L, only at the beginning.  deteriorate afterwards. User rewarded for providing old content?
+
+% probably not
+reputation, credit
+
+
+\section{Economics in distributed system}
+Demand and supply \cite{2009:demandsupplyres:andrade}\\
+
+Public tracker generally slow\todo{find citation}. Why? 
+
+private > public
+oversupply, undersupply -> not all necessary to be mined \cite{2015:sustainabilitypt:vinko}
+investment in swarm (decision)
+motivation in priv and public
+
+incentive -> various, centralized, decentralized. Complicated or not. modifying bittorrent protocol? -> not standard 
+
+\section{Optimizing network cost}
+Anonymous Relaying performance in Tribler \cite{2015:onionroutetribler:stokkink}\\
+Significant portion when seeding million torrents \cite{2012:milliontorrent:arvid}
+
+\section{Main Contributions}
+
+\subsection{Research Questions}
 
 \section{Document Structure}
-This thesis is structured as follows. Chapter 2 provides problem description and answer to tackle this issue. Chapter 3 discusses related work to the problem and solution proposed. Chapter 4 presents the design of credit mining system integrated with Tribler. Implementation of the mechanism and it's experiment will be elaborated in chapter 5. Chapter 6 shows performance of credit mining system. At the end, chapter 7 concludes the work mentioning possible future work.
+This thesis is structured as follows. Chapter 2 discusses related work to the problem and solution proposed. Chapter 3 presents the design of credit mining system integrated with Tribler. Implementation of the mechanism and it's experiment will be elaborated in chapter 4. Chapter 5 shows performance of credit mining system. At the end, chapter 6 concludes the work mentioning possible future work.
