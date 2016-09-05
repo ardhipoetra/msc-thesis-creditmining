@@ -21,6 +21,12 @@
 % because some of the author have accented name
 \usepackage[utf8]{inputenc}
 
+% use natbib to cite author easily. Change latex8 into ieee in style
+\usepackage[square,numbers]{natbib}
+
+% Command to abbrv the common words (I'm lazy)
+\newcommand{\bt}{BitTorrent}
+
 \begin{document}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -86,7 +92,8 @@
 \include{7_conclusionsandfuturework}
 
 % BIBLIOGRAPHY
-\bibliographystyle{bib/latex8}
+%\bibliographystyle{bib/latex8}
+\bibliographystyle{bib/IEEEtranN} % changed latex8, I think its compatible
 \bibliography{bib/bibliography}
 
 %\appendix
