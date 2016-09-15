@@ -2,40 +2,40 @@
 \label{chp:relwork}
 
 \section{BitTorrent}
-\bt~\cite{2003:bittorrent:cohen} is a file distributed system on top of peer-to-peer network. Static \texttt{.torrent} file, which contains information such as tracker addresses and unique hash value of this swarm, is created by peer who want to publish their files. \textit{Tracker} responsible for monitors the distribution and progress of file and peers in a swarm. Peer uses information in \texttt{.torrent} file to connect each other.
+\bt~\cite{2003:bittorrent:cohen} is a file distributed system on top of peer-to-peer network. Static \texttt{.torrent} file, which contains information such as tracker addresses and unique hash value of this swarm, is created by peer who wants to publish their files. \textit{Tracker} is responsible for monitors the distribution and progress of file and peers in a swarm. Peer uses information in \texttt{.torrent} file to connect each other.
 
 % tit-for-tat, choking, unchoke, optimistic unchoke
 \todo{cite cheating peers/freeloader/hit-n-run behavior}
 \todo{cite choke/unchoke algorithm}
-In \bt, it is desirable to have many peers upload piece of file to the swarm. This way, swarm can be \textit{healthier} and overall download speed can increase. However, many peers become a \textit{leecher}, which quits the swarm when his download finished. \bt~uses \textit{tit-for-tat} mechanism to reward good behavior and punish bad behavior. To force cooperation of other peer, \bt~ implement \textit{choking algorithm}. Choking algorithm is an algorithm to temporarily refuse uploading piece of file to a particular peer. Usually, an uploader has limited number of unchoked slots. By observing other peers, choking algorithm decide which peer a particular piece will be sent or not sent to. If we unchoke a peer, it means we consider to upload a piece to that peer. For starters, it is usually useful to execute \textit{optimistic unchoking}. Optimistic unchoking is an algorithm to unchoke a peer regardless of its activity in a swarm. This gives a peer chance to increase his upload rate by providing more content.
+In \bt, it is desirable to have many peers upload piece of file to the swarm. This way, swarm can be \textit{healthier}, and overall download speed can increase. However, many peers become a \textit{leecher}, which quit the swarm when his download finished. \bt~uses \textit{tit-for-tat} mechanism to reward good behavior and punish bad behavior. To force cooperation of other peers, \bt~ implement \textit{choking algorithm}. Choking algorithm is an algorithm to temporarily refuse uploading piece of file to a particular peer. Usually, an uploader has a limited number of unchoked slots. By observing other peers, choking algorithm decides which peer a particular piece will be sent or not sent to. If we unchoke a peer, it means we consider to upload a piece to that peer. For starters, it is usually useful to execute \textit{optimistic unchoking}. Optimistic unchoking is an algorithm to unchoke a peer regardless of its activity in a swarm. This gives a peer a chance to increase his upload rate by providing more content.
 
 % peer discovery DHT, PEX, LSD
 \subsection{Peer Discovery}
-\todo{LSD? (bep\_0014.html)}
-One of the integral part in \bt~protocol is peer discovery. With a large number of known peers, the algorithm will have more option on which peer to unchoke. State of the swarm itself often represented by the peer belong to that swarm. In \bt, there are four method to discover new or update peer. 
+One of the integral part in \bt~protocol is peer discovery. With numerous known peers, the algorithm will have more option on which peer to unchoke. State of the swarm itself often represented by the peer belong to that swarm. In \bt, there are four methods to discover new or update peer. 
 
 \subsubsection{Tracker Peer Announce}
-In original design of \bt, it uses tracker to allow peer discover each other \cite{2003:bittorrent:cohen}. Tracker tend to use random and limited list of peers. Peer contact tracker periodically to expand their peer dictionary. This act of requesting peer to tracker is called \textit{announce}.	Usually, most tracker has a policy about recommended interval when to recontact for getting new peers. Violate this policy can result a particular peer blocked.
+In original design of \bt, it uses tracker to allow peer discover each other \cite{2003:bittorrent:cohen}. Tracker tends to use random and limited list of peers. Peer contact tracker periodically to expand their peer dictionary. This act of requesting peer to tracker is called \textit{announce}.	Usually, most tracker has a policy about recommended interval when to recontact for getting new peers. Violate this policy can result a particular peer blocked.
 
 \subsubsection{Distributed Hash Table (DHT)}
 \todo{DHT performance?}
-Originally, peer need to contact tracker to fetch new peer address and file information. This makes \bt~very dependent on centralized system which vulnerable to single point of failure. In 2008, Distributed Hash Table (DHT) is proposed \cite{2008:dht:loewenstern}. Towards a ``trackerless'' \bt~system, DHT allow each peer to become a tracker. DHT stores peer contact information with defined key-space as ``node ID''. Each peer stored other peer's node ID and its address in their own routing table. A ``distance'' is measured on two node ID to define how close those two. ``Distance'' also can be measured between infohash of a torrent and node ID.
+Originally, peer needs to contact tracker to fetch new peer address and file information. This makes \bt~very dependent on centralized system which vulnerable to single point of failure. In 2008, Distributed Hash Table (DHT) was proposed \cite{2008:dht:loewenstern}. Towards a ``trackerless'' \bt~system, DHT allows each peer to become a tracker. DHT stores peer contact information with defined key-space as ``node ID''. Each peer stored other peer's node ID and its address in their own routing table. A ``distance'' is measured on two node ID to define how close those two. ``Distance'' also can be measured between infohash of a torrent and node ID.
 
 To enrich its peer dictionary, a node can compare a torrent's infohash and node ID in its routing table. If the distance under the threshold, it contacts that node to ask the information of the swarm, which includes the peer list. If contacted node do not know this torrent, it will respond with another node in its table which closest to the provided infohash.
 
 \subsubsection{Peer Exchange (PEX)}
-To increase the chance of getting higher downloading speed, having up to date peer is desired. This can be achieved by contacting tracker or using DHT. Reducing the interval of contacting tracker can result in getting a number of updated peer sooner, however, it will put a burden in the tracker itself. Peer Exchange (PEX )\cite{2015:PEX:the8472} is proposed to tackle this problem. PEX used list of peers that bootstrapped from another mechanism. This mechanism allow contact known peer directly to get and give up to date information on swarm. Theoretically, it can keep this swarm together if trackers are down. Specification mentioned in \cite{2015:PEX:the8472} stated a restriction such as number of request per minute and number of peer added or removed in a PEX message.
+To increase the chance of getting higher downloading speed, having up to date peer is desired. This can be achieved by contacting tracker or using DHT. Reducing the interval of contacting tracker can result in getting a number of updated peer sooner, however, it will put a burden on the tracker itself. Peer Exchange (PEX )\cite{2015:PEX:the8472} is proposed to tackle this problem. PEX used list of peers that bootstrapped from another mechanism. This mechanism allows contacting known peer directly to get and give up-to-date information on swarm. Theoretically, it can keep this swarm together if trackers are down. Specification mentioned in \cite{2015:PEX:the8472} stated a restriction such as number of request per minute and number of peer added or removed in a PEX message.
 
+\subsubsection{Local Service Directory (LSD)}
+To increase the performance when downloading from a swarm, it is preferable to get the file from local network if available. Local service directory (LSD) permit this by discover peers that are in the same local network. The transfer rate is much higher compared to other type of peers. In short, LSD uses multicast-like mechanism which broadcast infohash of a torrent.
 
 \section{Tribler}
 Tribler\footnote{\url{https://www.tribler.org/}} is peer-to-peer file sharing application that compatible with \bt~protocol \cite{2008:tribler:pouwelse}. Tribler focused on security, fully decentralized system, and anonymity. Starts with ABC (Another \bt~Client), Tribler currently provides content discovery, channels concept, and reputation management in fully distributed manner.
 
-\todo{What information to include?\\-anonymous\\-end2end encryption}
+Tribler is well known for its anonymity and secure interface on top of \bt~ network. In 2014, Tribler published a specification on its anonymity feature\footnote{\url{https://github.com/Tribler/tribler/wiki/Anonymous-Downloading-and-Streaming-specifications}}. It uses Tor-like onion routing with purely distributed mechanism. A year later, \citeauthor{2015:tunnel:ruigrok} on his work completed the \texttt{tunnel community} which emphasize end-to-end encryption in Tribler. This comes with several drawbacks. First is performance degradation. Adding layers of privacy comes with increasing the amount of cryptography operation which slows down end-to-end downloading activity \cite{2015:tunnel:ruigrok}.
 
-\subsection{Dispersy Community}
-\todo{Various community}
-\todo{Relation on peers}
-See table \ref{tbl:community}.
+All of the Tribler main components such as end-to-end encryption, channel discovery, and many others relied in database and dissemination system called \texttt{Dispersy} \cite{2013:dispersy:zeilemaker}. Dispersy maintain and perform the communication between Tribler peers in fully decentralized manner. Dispersy able to circulate the message in one-to-one or one-to-many within a group of node called \texttt{community}. User can adapt and implement its desired \textit{community} by itself. It is including how, what, and where the communication will occur.
+
+Tribler implements several \textit{Dispersy} communities as its core function. \citeauthor{2016:tribler-techdebt:vos} summarize the recent community in Tribler. As shown in table \ref{tbl:community}, important features such as channel discovery, search within community, end-to-end Tor-like operations, and currency mechanism. \textit{Channel} is a collection of torrent that has extra capabilities such as vote system, spam prevention, and comment (social) attributes. Every user can create his own channel, add and remove torrent to it, and maintain its activity.
 
 \begin{table}[tbp]
 	\centering
@@ -54,14 +54,20 @@ See table \ref{tbl:community}.
 	\end{tabular}
 \end{table}
 
-
 \section{Libtorrent}
+
 \subsection{Share Mode}
 
 \section{Credit Mining Framework}
 Credit mining base \cite{2015:creditmining:capota}.\\ Investment strategy in regression model \cite{2013:investmentcm:capota}. \\Use libtorrent as helper. Multiple helper and its effect to swarm with actual downloading on the other side \cite{2014:bwmarket:capota}. actual improvement! shift bottleneck and seed efficiently. Use trace to 
 
-Inter swarm resource allocation \cite{2011:interswarm:mihai}.
+Inter swarm resource allocation \cite{2011:interswarm:capota}.
+
+Some research has been conducted to tackle performance degradation in a swarm.
+% some to increase throughput
+smart cloud seeding -> mix download from cloud and p2p. Analysis on which swarm/file to help
+
+
 
 \section{P2P Currency}
 Current currency used in Tribler (Multichain)\cite{2015:multichain:norberhuis}.\\ Demand and supply in bittorrent environment \cite{2009:demandsupplyres:andrade}.
