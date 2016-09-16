@@ -35,7 +35,7 @@ Tribler is well known for its anonymity and secure interface on top of \bt~ netw
 
 All of the Tribler main components such as end-to-end encryption, channel discovery, and many others relied in database and dissemination system called \texttt{Dispersy} \cite{2013:dispersy:zeilemaker}. Dispersy maintain and perform the communication between Tribler peers in fully decentralized manner. Dispersy able to circulate the message in one-to-one or one-to-many within a group of node called \texttt{community}. User can adapt and implement its desired \textit{community} by itself. It is including how, what, and where the communication will occur.
 
-Tribler implements several \textit{Dispersy} communities as its core function. \citeauthor{2016:tribler-techdebt:vos} summarize the recent community in Tribler. As shown in table \ref{tbl:community}, important features such as channel discovery, search within community, end-to-end Tor-like operations, and currency mechanism. \textit{Channel} is a collection of torrent that has extra capabilities such as vote system, spam prevention, and comment (social) attributes. Every user can create his own channel, add and remove torrent to it, and maintain its activity.
+Tribler implements several Dispersy \textit{communities} on its core function. \citeauthor{2016:tribler-techdebt:vos} summarize the recent community in Tribler. As shown in table \ref{tbl:community}, important features such as channel discovery, search within community, end-to-end Tor-like operations, and currency mechanism. \textit{Channel} is a collection of torrent that has extra capabilities such as vote system, spam prevention, and comment (social) attributes. Every user can create his own channel, add and remove torrent to it, and maintain its activity.
 
 \begin{table}[tbp]
 	\centering
@@ -54,9 +54,13 @@ Tribler implements several \textit{Dispersy} communities as its core function. \
 	\end{tabular}
 \end{table}
 
-\section{Libtorrent}
+\subsection{Libtorrent}
+Another Tribler dependency is \textit{libtorrent}\footnote{\url{http://libtorrent.org/}}. With \bt~is just a collection of specification, it free to be implemented with any languages. One of the implementation in \texttt{C++} is \textit{libtorrent}. \textit{libtorrent} also has \texttt{python} binding which the same language as Tribler implementation. \textit{Libtorrent} started in 2003 by Arvid Norberg. \textit{Libtorrent} is used by many torrent client such as Deluge, qBittorrent, Free download managers, and many others.
 
-\subsection{Share Mode}
+\subsubsection{Share Mode}
+One of the crucial feature used in this work is \textit{share mode}. Initial work performed by \citeauthor{2015:creditmining:capota} also used this feature\cite{2015:creditmining:capota}. By enabling share mode, it means that one is not interested in downloading the file, but gaining higher share ratio. It is done by download as little as possible and upload as much as possible. Share mode only download a torrent where it has sufficient capacity. A torrent downloaded in share mode may never finish as \textit{libtorrent} only download piece of a torrent which satisfied the share mode requirements. Share mode can be enabled per torrent basis.
+
+There are several limitations on this feature as we observed. First, it only has single parameter which determine the desired target of share ratio. This limits the exploration and full use of share mode feature. Another issues are storage and network inefficiency. If enabled, share mode works by downloading popular piece of a particular torrent. This means few downloaded pieces could take a large storage. Share mode also did not check whether a swarm is efficient enough to perform this operation. This wasted bandwidth used to check torrent pieces regularly.
 
 \section{Credit Mining Framework}
 Credit mining base \cite{2015:creditmining:capota}.\\ Investment strategy in regression model \cite{2013:investmentcm:capota}. \\Use libtorrent as helper. Multiple helper and its effect to swarm with actual downloading on the other side \cite{2014:bwmarket:capota}. actual improvement! shift bottleneck and seed efficiently. Use trace to 
