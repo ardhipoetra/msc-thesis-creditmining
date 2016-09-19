@@ -10,7 +10,7 @@
 % FONT: times
 \usepackage{times}
 % for url's use "\url{http://www.google.com/}"
-\usepackage{url}
+\usepackage[hyphens]{url}
 
 % for fancy header on table
 \usepackage[table,xcdraw]{xcolor}
@@ -26,6 +26,14 @@
 
 % we love bookmarks in pdf
 \usepackage[hidelinks]{hyperref}
+
+\usepackage{caption}
+
+\usepackage{subcaption}
+
+\usepackage{algorithmicx}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 
 % Command to abbrv the common words (I'm lazy)
 \newcommand{\bt}{BitTorrent}
@@ -85,7 +93,6 @@
 \include{1_introduction}
 
 % CHAPTERS
-%\include{2_probdesc}
 \include{2_relatedwork}
 \include{3_design}
 \include{4_implement_exp}
