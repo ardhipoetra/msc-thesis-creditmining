@@ -58,20 +58,75 @@ Tribler implements several Dispersy \textit{communities} on its core function. \
 Another Tribler dependency is \textit{libtorrent}\footnote{\url{http://libtorrent.org/}}. With \bt~is just a collection of specification, it free to be implemented with any languages. One of the implementation in \texttt{C++} is \textit{libtorrent}. \textit{libtorrent} also has \texttt{python} binding which the same language as Tribler implementation. \textit{Libtorrent} started in 2003 by Arvid Norberg. \textit{Libtorrent} is used by many torrent client such as Deluge, qBittorrent, Free download managers, and many others.
 
 \subsubsection{Share Mode}
-One of the crucial feature used in this work is \textit{share mode}. Initial work performed by \citeauthor{2015:creditmining:capota} also used this feature\cite{2015:creditmining:capota}. By enabling share mode, it means that one is not interested in downloading the file, but gaining higher share ratio. It is done by download as little as possible and upload as much as possible. Share mode only download a torrent where it has sufficient capacity. A torrent downloaded in share mode may never finish as \textit{libtorrent} only download piece of a torrent which satisfied the share mode requirements. Share mode can be enabled per torrent basis.
+One of the crucial feature used in this work is \textit{share mode} \footnote{Core code of share mode can be found in \url{https://github.com/arvidn/libtorrent/blob/master/src/torrent.cpp\#L9586-L9727}}. Initial work performed by \citeauthor{2015:creditmining:capota} also used this feature\cite{2015:creditmining:capota}. By enabling share mode, it means that one is not interested in downloading the file, but gaining higher share ratio. It is done by download as little as possible and upload as much as possible. Share mode only download a torrent where it has sufficient capacity. A torrent downloaded in share mode may never finish as \textit{libtorrent} only download piece of a torrent which satisfied the share mode requirements. Share mode can be enabled per torrent basis.
 
-There are several limitations on this feature as we observed. First, it only has single parameter which determine the desired target of share ratio. This limits the exploration and full use of share mode feature. Another issues are storage and network inefficiency. If enabled, share mode works by downloading popular piece of a particular torrent. This means few downloaded pieces could take a large storage. Share mode also did not check whether a swarm is efficient enough to perform this operation. This wasted bandwidth used to check torrent pieces regularly.
+\todo[inline]{Share mode algorithm}
+Share mode algorithm works as algorithm \ref{alg:ltsharemode}.
+\todo[inline]{Share mode algorithm}
+
+There are several limitations on this feature as we observed. First, it only has single parameter which determine the desired target of share ratio. This limits the exploration and full use of share mode feature. Another issues are storage and network inefficiency. If enabled, share mode works by downloading popular piece of a particular torrent. This means few downloaded pieces could take a large storage. Share mode also did not check whether a swarm is efficient enough to perform this operation. It only tries to find popular pieces regardless of the swarm condition. It is highly possible that if a swarm is in poor capacity, the uploading rate is very low. The bandwidth used to check torrent pieces regularly is wasted and the ``investment'' will not go well.
+
+\todo{Adapt to current share mode algorithm}
+\begin{algorithm}
+	\caption{Libtorrent share mode algorithm}
+	\label{alg:ltsharemode}
+	\begin{algorithmic}[1]
+		\Require{$B, T, S, D$}
+		\Statex
+		\State{$missing\_piece = 0$} \Comment{missing piece}
+		\ForAll{$p \in connected\_peers$}
+			\If{$p$ is a $leecher$ $and$ $p$ is not in share\_mode}	
+				\State{$missing\_pieces$} += {$total\_pieces - pieces(p)$}
+			\EndIf	
+		\EndFor
+		\State{$missing\_pieces$} -= {$B \times |connected\_seeders|$}		
+		\If{$missing\_pieces \leq 0$}
+			\State \Return
+		\EndIf
+		\If{$|connected\_seeders|$ / $|connected\_peers| > S$}
+			\State disconnect excess seeders
+		\EndIf
+		\If{$downloaded \times T > uploaded$}
+			\State \Return
+		\EndIf
+		\If{$downloading \times D > downloaded$}
+			\State \Return
+		\EndIf
+		\If{$|connected\_peers| - min(pieces_rarities) < T$}
+			\State \Return
+		\EndIf
+		\State download {$random(rarest\_pieces)$}
+	\end{algorithmic}
+\end{algorithm}
 
 \section{Credit Mining Framework}
-Credit mining base \cite{2015:creditmining:capota}.\\ Investment strategy in regression model \cite{2013:investmentcm:capota}. \\Use libtorrent as helper. Multiple helper and its effect to swarm with actual downloading on the other side \cite{2014:bwmarket:capota}. actual improvement! shift bottleneck and seed efficiently. Use trace to 
+\label{section:cmprior}
+Preliminary work on credit mining has been done by \citeauthor{2015:creditmining:capota} \cite{2015:creditmining:capota, 2013:investmentcm:capota, 2014:bwmarket:capota}. At the first phase, they implement complex method with speculative download to assess the swarms\cite{2013:investmentcm:capota}. Extending this work, they introduced \textit{helper} peer to seed low capacity swarm using libtorrent \textit{share mode}\cite{2014:bwmarket:capota}. Recently, they moved into multiple swarm approach and using public community as their research object. With swarm selection policy, they observed whether helper peer can generate high credit with less downloading\cite{2015:creditmining:capota}.
 
-Inter swarm resource allocation \cite{2011:interswarm:capota}.
+In \citeyear{2013:investmentcm:capota}, \citeauthor{2013:investmentcm:capota} introduced bandwidth investing in \bt~private communities. He applied speculative download (as shown in figure \ref{fig:sde13}) on prospected swarm. This research used activity data crawled from Bitsoup\footnote{\url{https://www.bitsoup.me}} to evaluate their system. Every swarm is analyzed whether it will keep the swarm in \textit{cache} or discard it. Swarm is scored by predicting future upload speed defined in multiple regression model\cite{2013:investmentcm:capota}. One of the findings is that this algorithm depends on the size of the evaluated swarm. The more swarm need to be assessed, there is less chance the algorithm will find suitable cache to replace. This also shows the high costs and complexity of \textit{multivariate adaptive regression splines} (MARS) implemented in this system.
 
-Some research has been conducted to tackle performance degradation in a swarm.
-% some to increase throughput
-smart cloud seeding -> mix download from cloud and p2p. Analysis on which swarm/file to help
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pics/SDE2013.png}
+	\caption{Speculative download mechanism \cite{2013:investmentcm:capota}}.
+	\label{fig:sde13}
+\end{figure}
 
+A year after, in \citeyear{2014:bwmarket:capota}, a research to align supply and demand in \bt~network is conducted. The idea is each peer monitor their swarms to detect whether there will be potential undersupply. If such a condition is found, one will broadcast \textit{help request} to specialized peers in order to seed this swarm. Specialized peers, called \textit{helpers}, tries to download as little as possible while upload as much as possible using \textit{libtorrent} share mode. They implement multiple helper and observe its effect to swarm with actual downloading on the other side. Their experiment result shows that using share mode in closed environment will increase download performance if the bandwidth is underutilized \cite{2014:bwmarket:capota} by shifting the bottleneck in the swarm. Moreover, \textit{libtorrent} share mode is also proven to be able to detect whether a swarm has enough capacity or not. This research also discussed flash crowd scenario. In this scenario, the existence of helper peer can lead leecher peer to reach higher download speed, especially in the early time of scenario. 
+ 
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\textwidth]{pics/creditmining2015.pdf}
+	\caption{The overview of credit mining process \cite{2015:creditmining:capota}}.
+	\label{fig:cm15}
+\end{figure}
 
+The most recent work was conducted in \citeyear{2015:creditmining:capota}\cite{2015:creditmining:capota}. \citeauthor{2015:creditmining:capota} incorporated his previous work into Credit Mining System (CMS) implemented in Tribler. CMS able to monitor multiple swarm in one moment, and then decide which swarm this system will donate its bandwidth to. It uses simpler policy on choosing swarm compared to multivariate regression model in \cite{2013:investmentcm:capota}. As policy input, CMS uses torrent parameters such as seeder and leecher number obtained from tracker/DHT, creation date, length, and many others. The overview of mining process is shown in figure \ref{fig:cm15}. The experiment was conducted in live fashion on RSS \textit{etree.org}\footnote{\url{http://bt.etree.org/rss/bt\_etree\_org.rdf}} public community. They observed \textit{net upload gain} which defined as difference of uploaded bytes and downloaded bytes. Proposed policy and framework resulted in positive effect to the community.
+
+Recent work on helping other user or increasing downloading performance using \bt~ has been done. \citeauthor{2014:cloudseed:leon} uses \bt~ protocol to increase user download speed and at the same time reduce datacenters load. They analyze which swarm or file to help using user bandwidth information and number of connected user\cite{2014:cloudseed:leon}. From another perspective, \citeauthor{2015:coalitionbt:zhang} introduced the \textit{coalition} between \bt~ peers. Coalition is a set of peers that cooperate each other in regards to \bt~policy to minimize download completion time. They also propose coalition-compatible choking strategy to replace the current \bt~one. This research lead to significant performance improvement within the coalition \cite{2015:coalitionbt:zhang}. Although not using \bt~protocol, in \citeyear{2009:p2phelp:he}, \citeauthor{2009:p2phelp:he} proved that helper peer also can improve the streaming capacity in P2P system\cite{2009:p2phelp:he}. \citeauthor{2016:gameauctionp2pstream:mostafavi} extend this work by introducing auction aspect for uploader to choose which user will receive the bandwidth he donate \cite{2016:gameauctionp2pstream:mostafavi}. \citeauthor{2016:gameauctionp2pstream:mostafavi} used game-theory to propose new framework in uncooperative peers with maximizing the credit gain for helpers.
 
 \section{P2P Currency}
+% Some research has been conducted to tackle performance degradation in a swarm.
+% some to increase throughput
 Current currency used in Tribler (Multichain)\cite{2015:multichain:norberhuis}.\\ Demand and supply in bittorrent environment \cite{2009:demandsupplyres:andrade}.
+Tracking back, generally, the core of credit mining try to solve supply and demand misalignment. \citeauthor{2011:interswarm:capota} in \citeyear{2011:interswarm:capota} showed that in private community \cite{2011:interswarm:capota}.
