@@ -38,6 +38,7 @@ All of the Tribler main components such as end-to-end encryption, channel discov
 
 Tribler implements several Dispersy \textit{communities} on its core function. \citeauthor{2016:tribler-techdebt:vos} summarize the recent community in Tribler. As shown in table \ref{tbl:community}, important features such as channel discovery, search within community, end-to-end Tor-like operations, and currency mechanism. \textit{Channel} is a collection of torrent that has extra capabilities such as vote system, spam prevention, and comment (social) attributes. Every user can create his own channel, add and remove torrent to it, and maintain its activity.
 
+\todo[inline]{expand:tribler tunnel community?}
 \begin{table}[tbp]
 	\centering
 	\caption{Overview of implemented Dispersy community in Tribler \cite{2016:tribler-techdebt:vos}.}
@@ -127,12 +128,40 @@ A year after, in \citeyear{2014:bwmarket:capota}, a research to align supply and
 
 The most recent work was conducted in \citeyear{2015:creditmining:capota}\cite{2015:creditmining:capota}. \citeauthor{2015:creditmining:capota} incorporated his previous work into Credit Mining System (CMS) implemented in Tribler. CMS able to monitor multiple swarm in one moment, and then decide which swarm this system will donate its bandwidth to. It uses simpler policy on choosing swarm compared to multivariate regression model in \cite{2013:investmentcm:capota}. As policy input, CMS uses torrent parameters such as seeder and leecher number obtained from tracker/DHT, creation date, length, and many others. The overview of mining process is shown in figure \ref{fig:cm15}. The experiment was conducted in live fashion on RSS \textit{etree.org}\footnote{\url{http://bt.etree.org/rss/bt\_etree\_org.rdf}} public community. They observed \textit{net upload gain} which defined as difference of uploaded bytes and downloaded bytes. Proposed policy and framework resulted in positive effect to the community.
 
-Recent work on helping other user or increasing downloading performance using \bt~ has been done. \citeauthor{2014:cloudseed:leon} uses \bt~ protocol to increase user download speed and at the same time reduce datacenters load. They analyze which swarm or file to help using user bandwidth information and number of connected user\cite{2014:cloudseed:leon}. From another perspective, \citeauthor{2015:coalitionbt:zhang} introduced the \textit{coalition} between \bt~ peers. Coalition is a set of peers that cooperate each other in regards to \bt~policy to minimize download completion time. They also propose coalition-compatible choking strategy to replace the current \bt~one. This research lead to significant performance improvement within the coalition \cite{2015:coalitionbt:zhang}. Although not using \bt~protocol, in \citeyear{2009:p2phelp:he}, \citeauthor{2009:p2phelp:he} proved that helper peer also can improve the streaming capacity in P2P system\cite{2009:p2phelp:he}. \citeauthor{2016:gameauctionp2pstream:mostafavi} extend this work by introducing auction aspect for uploader to choose which user will receive the bandwidth he donate \cite{2016:gameauctionp2pstream:mostafavi}. \citeauthor{2016:gameauctionp2pstream:mostafavi} used game-theory to propose new framework in uncooperative peers with maximizing the credit gain for helpers.
-
-
-\section{P2P Currency}
+\section{Peer-to-peer economics}
 % Some research has been conducted to tackle performance degradation in a swarm.
 % some to increase throughput
-Current currency used in Tribler (Multichain)\cite{2015:multichain:norberhuis}.\\ Demand and supply in bittorrent environment \cite{2009:demandsupplyres:andrade}.
+\todo[inline]{repost of problem description?}
+
+\subsection{P2P currency and incentive}
+Current currency used in Tribler (Multichain)\cite{2015:multichain:norberhuis}.\\ 
+Torcoin \cite{2014:torcoin:ghosh}. \\
+Lira \cite{2013:lira:jansen}.\\
+Wealth/credit, resale value \cite{2012:economicbt:kash}.\\
+
+Incentives. p2p net with wireless peer \cite{2015:incentivep2pgame:kang}.\\
+Effort based incentive \cite{2010:effortincentive:rahman}.\\
+Limitation of decentralized incentive (upper bound) \cite{2011:limitincentive:meulpolder}.\\
+
+Unstable credit system in p2p \cite{2015:sustainabilitypt:vinko}, solve by \cite{2010:crashsustain:rahman}.
+
+
+\subsection{Tackling free rider problem}
+Issue discussed in \cite{2000:freeridegnutella:adar}.\\
+Bittorrent handle this by tit-for-tat \cite{2003:bittorrent:cohen}.\\
+The behaviour \cite{2015:freeriderinbtcommunity:das}.\\
+
+Require the change of the system :  \cite{2008:givetogetvod:Mol}. 
+
+Another problem : tragedy of the commons \cite{1968:tragedycommon:hardin}. Can solve by reputation \cite{2002:reputationtotragedy:milinski}
+
+\subsection{Supply and Demand}
+Demand and supply in bittorrent environment \cite{2009:demandsupplyres:andrade}. \\
 Tracking back, generally, the core of credit mining try to solve supply and demand misalignment. \citeauthor{2011:interswarm:capota} in \citeyear{2011:interswarm:capota} showed that in private community \cite{2011:interswarm:capota}.\\
-Torcoin \cite{2014:torcoin:ghosh}. Lira \cite{2013:lira:jansen}.
+
+
+\subsection{Prospecting and Investment}
+\todo{moved from credit mining subsection}
+Recent work on helping other user or increasing downloading performance using \bt~ has been done. \citeauthor{2014:cloudseed:leon} uses \bt~ protocol to increase user download speed and at the same time reduce datacenters load. They analyze which swarm or file to help using user bandwidth information and number of connected user\cite{2014:cloudseed:leon}. From another perspective, \citeauthor{2015:coalitionbt:zhang} introduced the \textit{coalition} between \bt~ peers. Coalition is a set of peers that cooperate each other in regards to \bt~policy to minimize download completion time. They also propose coalition-compatible choking strategy to replace the current \bt~one. This research lead to significant performance improvement within the coalition \cite{2015:coalitionbt:zhang}. Although not using \bt~protocol, in \citeyear{2009:p2phelp:he}, \citeauthor{2009:p2phelp:he} proved that helper peer also can improve the streaming capacity in P2P system\cite{2009:p2phelp:he}. \citeauthor{2016:gameauctionp2pstream:mostafavi} extend this work by introducing auction aspect for uploader to choose which user will receive the bandwidth he donate \cite{2016:gameauctionp2pstream:mostafavi}. \citeauthor{2016:gameauctionp2pstream:mostafavi} used game-theory to propose new framework in uncooperative peers with maximizing the credit gain for helpers.
+
+Crawl bittorrent network \cite{2011:yoshida:crawlbtnet}. More can be seen in \cite{2010:btworld:wojciechowski}.
