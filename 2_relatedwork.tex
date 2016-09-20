@@ -29,6 +29,7 @@ To increase the chance of getting higher downloading speed, having up to date pe
 To increase the performance when downloading from a swarm, it is preferable to get the file from local network if available. Local service directory (LSD) permit this by discover peers that are in the same local network. The transfer rate is much higher compared to other type of peers. In short, LSD uses multicast-like mechanism which broadcast infohash of a torrent.
 
 \section{Tribler}
+\label{section:tribler}
 Tribler\footnote{\url{https://www.tribler.org/}} is peer-to-peer file sharing application that compatible with \bt~protocol \cite{2008:tribler:pouwelse}. Tribler focused on security, fully decentralized system, and anonymity. Starts with ABC (Another \bt~Client), Tribler currently provides content discovery, channels concept, and reputation management in fully distributed manner.
 
 Tribler is well known for its anonymity and secure interface on top of \bt~ network. In 2014, Tribler published a specification on its anonymity feature\footnote{\url{https://github.com/Tribler/tribler/wiki/Anonymous-Downloading-and-Streaming-specifications}}. It uses Tor-like onion routing with purely distributed mechanism. A year later, \citeauthor{2015:tunnel:ruigrok} on his work completed the \texttt{tunnel community} which emphasize end-to-end encryption in Tribler. This comes with several drawbacks. First is performance degradation. Adding layers of privacy comes with increasing the amount of cryptography operation which slows down end-to-end downloading activity \cite{2015:tunnel:ruigrok}.
@@ -129,9 +130,9 @@ The most recent work was conducted in \citeyear{2015:creditmining:capota}\cite{2
 Recent work on helping other user or increasing downloading performance using \bt~ has been done. \citeauthor{2014:cloudseed:leon} uses \bt~ protocol to increase user download speed and at the same time reduce datacenters load. They analyze which swarm or file to help using user bandwidth information and number of connected user\cite{2014:cloudseed:leon}. From another perspective, \citeauthor{2015:coalitionbt:zhang} introduced the \textit{coalition} between \bt~ peers. Coalition is a set of peers that cooperate each other in regards to \bt~policy to minimize download completion time. They also propose coalition-compatible choking strategy to replace the current \bt~one. This research lead to significant performance improvement within the coalition \cite{2015:coalitionbt:zhang}. Although not using \bt~protocol, in \citeyear{2009:p2phelp:he}, \citeauthor{2009:p2phelp:he} proved that helper peer also can improve the streaming capacity in P2P system\cite{2009:p2phelp:he}. \citeauthor{2016:gameauctionp2pstream:mostafavi} extend this work by introducing auction aspect for uploader to choose which user will receive the bandwidth he donate \cite{2016:gameauctionp2pstream:mostafavi}. \citeauthor{2016:gameauctionp2pstream:mostafavi} used game-theory to propose new framework in uncooperative peers with maximizing the credit gain for helpers.
 
 
-
 \section{P2P Currency}
 % Some research has been conducted to tackle performance degradation in a swarm.
 % some to increase throughput
 Current currency used in Tribler (Multichain)\cite{2015:multichain:norberhuis}.\\ Demand and supply in bittorrent environment \cite{2009:demandsupplyres:andrade}.
-Tracking back, generally, the core of credit mining try to solve supply and demand misalignment. \citeauthor{2011:interswarm:capota} in \citeyear{2011:interswarm:capota} showed that in private community \cite{2011:interswarm:capota}.
+Tracking back, generally, the core of credit mining try to solve supply and demand misalignment. \citeauthor{2011:interswarm:capota} in \citeyear{2011:interswarm:capota} showed that in private community \cite{2011:interswarm:capota}.\\
+Torcoin \cite{2014:torcoin:ghosh}. Lira \cite{2013:lira:jansen}.
