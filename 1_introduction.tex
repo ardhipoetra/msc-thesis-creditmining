@@ -1,144 +1,50 @@
 \chapter{Introduction}
 \label{chp:introduction}
-
-
-%in bittorrent -> peer as social user
-%
-% the performance of file-sharing in p2p system
-% cooperation important to keep swarm alive -> swarm evolution
-%
-%private trackers sometime force user to donating with SRE -> cite Chen, 2014
-%this resulting poor download motivation for users although its for greater goods
-%
-%in the other hand, public tracker have much less SLR compared to private (has its own problem)
-%
-% cms do here
-%
-%tribler user -> many -> donate -> swarm 
 After the introduction of the Internet on 60's and world wide web on 90's, there are more and more people connected each other using this technology. Initially, the architecture used to build the Internet is Peer-to-peer network although the most popular one is \textit{client and server}. A \textit{server} holds the content and delivers it to a user at the \textit{client} side, thus burden the server. Currently, recent research shows that peer-to-peer Internet already back at its prime by dominating the traffic\cite{2015:internettraffic:sandvine}.
 
-Among all the peer-to-peer usage in the Internet, file-sharing is the most popular one. It started with Napster in 1999 to share music file between its users. It shut down at 2001 and immediately followed by Kazaa and Gnutella afterward. Both services allowed the user to share not only music file but also another type of files. Currently, both already shut down because of legal and performance issues. \bt, nowadays, stand as \textit{de facto} file-sharing protocol on the peer-to-peer network. It survives until now because \bt~ is a \textit{protocol} that can be implemented by anyone, instead of service that Napster, Kazaa, and Gnutella used to have.
+Among all the peer-to-peer usage in the Internet, file-sharing is the most popular one. It started with Napster in 1999 to share music file between its users. It shut down at 2001 and immediately followed by Kazaa and Gnutella afterward. Both services allowed the user to share not only music file but also another type of files. Currently, both already shut down because of legal and performance issues. In Gnutella case, majority of users (70\%) stopped to share their files. Moreover, about half of the communication only served by top 1\% of the community \cite{2000:freeridegnutella:adar}. Gnutella suffers from a social phenomenon called \textit{freeriding} on majority of its users.
 
-In a \bt~system, cooperation between peers is crucial to keep a file available in the network. With more user provides the file, the download speed gained for other users will be increased as well. However, this needs user enthusiasm for providing the file regardless of its needs. For both public and private communities, the number of seeders becomes an issue that made a swarm unhealthy \cite{2010:pubpriv:meulpolder, 2014:sustainabilitytorrent:chen}. With freeriders join the swarm, naturally, it will reduce the overall performance. Furthermore, when freeriders become a majority, the swarm is as good as dead \cite{2000:freeridegnutella:adar}. 
+Freerider, can cause several problems, especially in peer-to-peer network. First and foremost, freeriding behaviour can lead to vulnerabilities in the system. With only few of the user provide the service for many, it is eventually become more centralized than decentralized system. Another well known problem caused by freeriders is the degradation of system performance \cite{2000:freeridegnutella:adar}. If freeriders become majority in file-sharing peer-to-peer system, as they occupy significant amount of resource, eventually bottleneck in the system will occur. As the time goes, honest peer may not feel satisfied and decided to leave the system. With important peer leave the system, it will degrade more and lost the file that used to be served by leaving peer. The system become unhealthy and sooner or later will be completely left by its peers.
 
-%example of solution
-% This problem is commonly addressed as prisoner's dilemma \todo{prisoner dilemma citation}.
-Several kinds of researches already provide solutions to prevent uncooperative peer behavior, all to indirectly push higher downloading throughput on downloader. Most of them focused their work on the incentives for peer or alteration of the currency system itself. Tribler for example, working on a MultiChain \cite{2015:multichain:norberhuis} as a secure and accountable currency in P2P system. \citeauthor{2008:givetogetvod:Mol} published free-riding resilient algorithm for Video on Demand (VoD) in P2P environment\cite{2008:givetogetvod:Mol}. \citeauthor{2015:incentivep2pgame:kang} used game theory as a formulation to incentivize peer in order to prevent free-riding behaviour\cite{2015:incentivep2pgame:kang}. They also considered mobile P2P network which only capable of low complexity mechanism. In their work, peers are awarded with different credit depend on connection type and content. The work on this thesis is more general and applicable as an another alternative hoping to solve this problem. 
+\section{BitTorrent protocol}
+\bt~\cite{2003:bittorrent:cohen}, nowadays, stand as \textit{de facto} file-sharing protocol on top of peer-to-peer network. It survives until now because \bt~ is a \textit{protocol} that can be implemented by anyone, instead of service that Napster, Kazaa, and Gnutella used to have. Static \texttt{.torrent} file, which contains information such as tracker addresses and unique hash value of this swarm, is created by peer who wants to publish their files. \textit{Tracker} is responsible for monitors the distribution and progress of file and peers in a swarm. Peer uses information in \texttt{.torrent} file to connect each other.
 
-%what this thesis do : credit mining tries to solve, 
-%design, implement, evaluate. also with normal downloading
-In this thesis, we introduce ``Credit mining system (CMS)'', an automatic investment framework on swarm with multidimensional gain. The first phase of the framework was conducted by \citeauthor{2015:creditmining:capota}, mainly to run CMS without any restriction or coordination with any client. With CMS, locally, a user can gain credit with internally limited bandwidth allocation without any intervention needed. The credit can be in many forms such as share ratio (upload-to-download ratio), uploaded amount, effort based credit, and many other. From higher perspective, CMS will help a swarm to keep alive by providing integral pieces to the peer who need it. Although CMS will be implemented in Tribler system, it is possible to apply this feature to any system on top of \bt~ network.
+\bt~uses \textit{tit-for-tat} mechanism to reward good behavior and punish bad behavior. This mechanism tried to solve fairness issue introduced by freeriding behavior \cite{2003:bittorrent:cohen}. \textit{Tit-for-tat} in \bt~ encourage user to only upload file to one who also has uploaded his file somewhere else. Freerider always getting low priority in this mechanism. In this way, \textit{tit-for-tat} incentivizes for user to upload a file. \bt protocol and its \textit{tit-for-tat} become a standard in file-sharing peer-to-peer system with many clients implemented this protocol.
 
-Tribler is one of the P2P file sharing software developed at Delft University of Technology that addressing social issues in \bt~network\cite{2008:tribler:pouwelse}. With Tribler downloaded from the official repository on the latest stable release (6.5.2) reaching  78440\footnote{\url{http://www.somsubhra.com/github-release-stats/ ?username=tribler&repository=tribler} (Accessed 3 September 2016)} times, it is desired to observe the usage of CMS with an adequate user base. We believe our work will be able to increase the overall swarm throughput by donating unused bandwidth on peer upstream.
+\subsection{Tribler}
+Tribler\footnote{\url{https://www.tribler.org/}} is peer-to-peer file sharing application developed at Delft University of Technology that compatible with \bt~protocol \cite{2008:tribler:pouwelse}. Tribler focused on security, fully decentralized system, and anonymity. Starts with ABC (Another \bt~Client), Tribler currently provides content discovery, channels concept, and reputation management in fully distributed manner. With Tribler downloaded from the official repository on the latest stable release (6.5.2) reaching  78440\footnote{\url{http://www.somsubhra.com/github-release-stats/ ?username=tribler&repository=tribler} (Accessed 3 September 2016)} times, it is desired to observe the usage of CMS with an adequate user base. We believe our work will be able to increase the overall swarm throughput by donating unused bandwidth on peer upstream.
 
+All of the Tribler main components such as end-to-end encryption, channel discovery, and many others relied in database and dissemination system called \texttt{Dispersy} \cite{2013:dispersy:zeilemaker}. Dispersy maintain and perform the communication between Tribler peers in fully decentralized manner. Dispersy able to circulate the message in one-to-one or one-to-many within a group of node called \texttt{community}. User can adapt and implement its desired \textit{community} by itself. It is including how, what, and where the communication will occur.
 
-%
-%Credit (share ratio or upload rate) is needed especially in private tracker. In this case, BitTorrent tit-for-tat is irrelevant \cite{2010:pubpriv:meulpolder}
+Tribler implements several Dispersy \textit{communities} on its core function. \citeauthor{2016:tribler-techdebt:vos} summarize the recent community in Tribler. Important features such as channel discovery, search within community, end-to-end Tor-like operations, and currency mechanism shown in table \ref{tbl:community}. \textit{Channel} is a collection of torrent that has extra capabilities such as vote system, spam prevention, and comment (social) attributes. Every user can create his own channel, add and remove torrent to it, and maintain its activity. Worth to mention that Tribler implemented its own reputation system to incentivize user. Reputable user will get boost from other Tribler user, so it is beneficial in its own way.
 
+In Tribler, there were several attemps to tackle freerider issue. Give-to-Get \cite{2008:givetogetvod:Mol} is one approach in peer-to-peer streaming video system. It works by give freerider only idle bandwidth slots and therefore their download speed will much slower\footnote{\url{https://www.tribler.org/Give-To-Get/}(Accessed 22 September 2016)}. There was also reputation management implemented in \textit{BarterCast4 community}, specifically to prevent freeriding in Tribler \cite{2009:bartercast:meulpolder}. It was used to spread the statistics about upload and download rate of a particular user \cite{2016:tribler-techdebt:vos}. And lastly, there is Multichain \cite{2015:multichain:norberhuis}, the anonymous tamper-proof interaction history that works on onion routing in Tribler network. Multichain projected to replace \textit{BarterCast4} as reputation system. Multichain has several improvement compared to \textit{BarterCast4} in aspect of security and accountability.
 
-\section{Peer-to-peer networks}
-In this section, we will discuss several aspects of peer-to-peer (P2P) networks. It will start with what and how important P2P currently is. Afterward, we will discuss social challenge that reduces overall performance which also explains peer behavior in P2P. The characteristics of \bt~ applications will be mentioned. Specifically for \bt~community, it is important to know the general classification and what symptom may happen in each community related to performance issue. 
-
-Interaction among user in the Internet community can be expressed in various fashion. Peer-to-peer (P2P) is one of the major interaction existed in the net. This shown in figure \ref{fig:usage}. Many applications and protocols run on top of P2P system, online gaming, computing, and the most popular one, file sharing. \bt~is by far the most popular system used in file-sharing community with its unique \textit{tit-for-tat} mechanism to discourage uncooperative peers \cite{2003:bittorrent:cohen}. 
-
-\begin{figure}[h]
+\begin{table}[tbp]
 	\centering
-	\begin{subfigure}[b]{0.8\textwidth}
-		\includegraphics[width=\linewidth]{pics/sandvine_eu_2015}
-		\caption{Sandvine data for 2015 internet usage in Europe}
-		\label{fig:usage1}
-	\end{subfigure}\\
-		\begin{subfigure}[b]{0.8\textwidth}
-			\includegraphics[width=\linewidth]{pics/sandvine_asia_2015}
-			\caption{Sandvine data for 2015 internet usage in Asia Pasific}
-			\label{fig:usage2}
-		\end{subfigure}%
-	\caption{Traffic of the Internet by Sandvine \cite{2015:internettraffic:sandvine}}.
-	\label{fig:usage}
-\end{figure}
+	\caption{Overview of implemented Dispersy community in Tribler \cite{2016:tribler-techdebt:vos}.}
+	\label{tbl:community}
+	\begin{tabular}{|l|p{11cm}|}
+		\hline
+		\rowcolor[HTML]{EFEFEF} 
+		\multicolumn{1}{|c|}{\cellcolor[HTML]{EFEFEF}{\color[HTML]{333333} \textbf{Community Name}}} & \multicolumn{1}{c|}{\cellcolor[HTML]{EFEFEF}{\color[HTML]{333333} \textbf{Purpose}}}                                                                                                                                     \\ \hline
+		\textit{AllChannel}                                                                          & Used to discover new channels and to perform remote channel search operations.                                                                                                                                           \\ \hline
+		\textit{BarterCast4}                                                                         & While currently disabled, this community was used to spread statistics about the upload and download rates of peers inside the network and has originally been created as a mechanism to prevent free-riding in Tribler. \\ \hline
+		\textit{Channel}                                                                             & This community represents a single channel and is responsible for managing torrents and playlists inside that channel.                                                                                                   \\ \hline
+		\textit{Multichain}                                                                          & This community utilizes the blockchain technology and can be regarded as the accounting mechanism that keeps track of shared and used bandwidth.                                                                         \\ \hline
+		\textit{Search}                                                                              & This community contains functionalities to perform remote keyword searches for torrents and torrent collecting operations.                                                                                               \\ \hline
+		\textit{(Hidden)Tunnel}                                                                      & This community contains the implementation of the Tor-like protocol that enables anonymity when downloading content and contains the foundations of the hidden seeder services protocol, used for anonymous seeding.     \\ \hline
+	\end{tabular}
+\end{table}
 
-In higher abstraction level, it is common to see P2P system, specifically in \bt, as social networking. Many social challenges, such as incentives mechanism, economic value to survive in the community, reputation identification, and user anonymity, addressed in this kind of network. All of those challenges involves peer behavior whether to help each other for the greater goods, selfishly consume all the resource without giving back, or inconsistently act between these two. It can be interpreted as maximizing their benefits and giving as little as possible. \textit{Freeriding} is the term given to this kind of behavior. It is often to describe this peer as \textit{freeriders}. Based on study by \citeauthor{2000:freeridegnutella:adar}, lots of P2P peers are always show self-interest and rationality, that is, freeriding \cite{2000:freeridegnutella:adar}. In Gnutella case, it even reaches 70\% os its user.  However, \citeauthor{2005:bittorrentcooperation:andrade} showed that \bt~is indeed increased cooperation with only less than 10\% peer is uploading something. In \textit{private community}, this has gone better with higher SLR. Even \citeauthor{2015:freeriderinbtcommunity:das} found that freerider in \bt~ does not deteriorate system performance\cite{2015:freeriderinbtcommunity:das}. All of this fact, however, does not change the fact that P2P users generally are still selfish \cite{2014:userbehaviourprivate:jia}. 
+\section{Rewarding user contribution}
+Freeriding behavior can be prevented by proper incentive mechanism. By showing goodness, specifically, by uploading data to others, user should get a reward. However, users are typically selfish and always tries to maximize their own benefit \cite{2015:incentivep2pgame:kang}. With unclear and non-obvious incentive mechanism, some peers who download a lot may or may not know that freeriding behavior is causing trouble for the system. Therefore, they could suffer from punishment. Reward and punishment can be in many forms such as right to download specific content, get higher download speed, and social acknowledgement.
 
-Peer-to-peer networks, not exclusively \bt, has many different applications. Some of them are multimedia streaming, online gaming, and file-transfer. All of those applications has different requirement to ensure user has flawless experience. Multimedia streaming, need 
-to achieve two conditions. First, the start up delay must be small to make sure user do not abandon his intent to stream the files. Secondly, the chunk (or piece) loss must be negligible, or at least low enough to provide good quality\cite{2008:givetogetvod:Mol}. Other application, P2P gaming, require more complex situation. Depend on the type of the game (e.g., FPS), peer latency must be under certain threshold\cite{2010:surveyp2pgame:shen}. It also needs to consider bandwidth demand and high security to prevent cheating between user. The most common P2P application, file transfer, obviously need high throughput by maximizing all the connection a user has\todo{expand:characteristics file-sharing needed}.
+To gain the reward is not as trivial as it sounds. Reward comes with good behavior which can be done by uploading content. This requires another user to actually download the content. In a community where the punishment is significantly severe, users typically very selective of its download activity. By downloading more, a user can be suspected with bad behavior that lead to punishment. Similar situation applies if the reward is insufficient. The user who want to get reward may need to standby for a long time waiting someone to download their files \cite{2013:survivepriv:jia}. This approach is inefficient, bandwidth wasting, but commonly practicable\cite{2013:survivepriv:jia}.
 
-%prisoner dilemma -> reduce througput
-\bt~ community can be divided into two categories : \textit{public} and \textit{private}. A community usually served by a \textit{tracker}. Public tracker means everybody can join the swarm served by that tracker. In the other hand, private communities are closed community which can be accessed by passing particular requirement \cite{2010:pubpriv:meulpolder, 2014:sustainabilitytorrent:chen}. \citeauthor{2010:pubpriv:meulpolder} measured that private communities have 3-5 times higher download speed compared to public communities \cite{2010:pubpriv:meulpolder}.
-
-Despite has different performance, both public and private community suffer from a similar issue: ``Poor downloading experience''. It is widely known that public community generally has low SLR which directly affect the swarm performance. In the other hand, private tracker suffers from ``\textit{poor downloading motivation}'' as described by \citeauthor{2014:sustainabilitytorrent:chen}\cite{2014:sustainabilitytorrent:chen} although private community intended to solve low SLR issue. The poor downloading motivation on private tracker affect the sustainability of a swarm. The imbalance of demand and supply will harm new members of private community and gradually degrade the motivation to keep active in the community for another user \cite{2014:sustainabilitytorrent:chen}.
-
-Peer-to-peer file sharing community, especially \bt~ can improve the user downloading experience. It does not give strain to server connection and naturally will download as fast as possible depending on file availability. However, uncooperative peer behavior and low file availability can affect a swarm's health thus reducing download experience.
-% problem: p2p social community is good if all peer is considerable, otherwise, it sucks.bittorrent pattern flashcrowd : many S/L, only at the beginning.  deteriorate afterwards. User rewarded for providing old content?
-% probably not
-% reputation, credit
-
-\section{Economics in \bt}
-As mentioned before, \bt~community can be viewed as social networking. Each peer represents a user. A user has \textit{needs}, which is to download a file, to be fulfilled. A file is provided by another user who has different need. This situation creates supply and demand as in traditional economics. This section will discuss supply and demand condition in \bt~system and its misalignment problem. Another issue which related to credit distribution that leads to system seize-up will be elaborated afterward. Also, it is important to mention how balanced system is desirable to sustain the swarm while no wasted resource on user.
-
-Supply and demand for both public and private \bt~communities have been studied by \citeauthor{2009:demandsupplyres:andrade} in \citeyear{2009:demandsupplyres:andrade}. \citeauthor{2009:demandsupplyres:andrade} shows that user who contribute more to the community, actually consume a lot from it. This explains that \bt~users are not altruistic enough to seed continuously. Although a significant amount of demand is successfully served by the community, there is only a few swarm that does not suffer from contention. Two reasons \citeauthor{2009:demandsupplyres:andrade} suggested are: (i) an asymmetric number of seeder and leecher, which seeder cannot compensate; and (ii) lack of incentive mechanism in the higher level aside from \bt~\textit{tit-for-tat}. 
-
-In public community, there is less supply compared to private community which enforce SRE \cite{2009:demandsupplyres:andrade}. This affects a file longevity because user seed longer in private community. If this behavior happened in long period, it might produce significant imbalance on supply and demand as seeder kept seeding a particular torrent without switching to another swarm. This phenomenon is accumulated by existing of \textit{flashcrowd} effect. Flashcrowd effect is the sudden increase in resource demand due to various reason. Newly published torrent is one of the reasons where flashcrowd effect take place \cite{2013:swarmevolution:su}. These misalignments between supply and demand can worsen the downloading experience in \bt.
-
-In economic terminology, it is necessary to specify a value of the resource that can lead to the ``wealth'' of a user. In \bt~system ``credit'' can be defined in various object. For specific, private community such as DIME\footnote{\url{www.dimeadozen.org}}, \citeauthor{2012:economicbt:kash}  defined credit as \texttt{4 x upload - download} in bytes, accumulated for all the torrent served in that community \cite{2012:economicbt:kash}. \citeauthor{2015:creditmining:capota} assume the credit on his work as the difference between uploaded and downloaded bytes. \citeauthor{2014:sustainabilitytorrent:chen} mentioned another form of credit that can be earned depend on the activity, for example, seeding more torrents, seeding longer and old torrent, and seeding torrent that consumes large disk space\cite{2014:sustainabilitytorrent:chen}. The definition of credit depends on the community itself. In general, \bt~also enforce credit system by its choking algorithm. It prefers to give the resource to the one who has the highest credit, in this case, the upload rate.
-
-The use of credit in \bt~environment must be implemented with utmost care. \citeauthor{2010:crashsustain:rahman} showed that credit dynamics in P2P community, especially \bt, can lead to system seize-up. There are three statuses observed: \textit{crash}, \textit{crunch}, and \textit{sustain}. Crash and crunch is the condition where there are too much credit and lack of credit, accordingly \cite{2015:sustainabilitypt:vinko}. To preserve swarm sustainability, there are two aspects that need to be considered. The first one is the swarm condition such as file size and initial credit distribution \cite{2015:sustainabilitypt:vinko}. \citeauthor{2015:sustainabilitypt:vinko} showed that large file size could decrease the sustainability of a swarm. As for initial credit configuration, it depends on the community itself. The wrong amount can crash the system, while with the right amount overall throughput can increase. Secondly, it is the peer behavior \cite{2010:crashsustain:rahman}. \citeauthor{2010:crashsustain:rahman} concluded that selfish peer who only upload in order to continue downloading (freeriding) can badly harm the swarm. Moreover, crash and crunch situation can only be solved with external intervention.
-
-Individual and community performance must be balanced with each other. \citeauthor{2015:sustainabilitypt:vinko} showed that both of them have conflicting interest. High few individual performance can lead to lower overall community performance and vice versa \cite{2015:sustainabilitypt:vinko}.  \citeauthor{2013:survivepriv:jia} also mentioned the oversupply swarm situation which limits the possibility of giving higher bandwidth allocation for users \cite{2013:survivepriv:jia}. Therefore, it is important for user to choose which community he want to seed to balance those interest.
-
-We define the activity of seeding with the expectation of obtaining credit to use later on as \textit{investment}\todo{another term?}. The act of seeding to help to increase the community performance graciously is called \textit{donating}. A user can \textit{prospect} which community he will invest or donate regardless of his own resource. Not all the swarm need to be seeded as we shown the drawbacks of oversupply. The prospecting and identifying swarm that needs to be seeded based on the seeder's intention (whether to invest or donate) is important. By providing proper prospecting function, users could help each other to improve the swarm quality. In good investing algorithm, users can make better use of its resource to gain credits when prospecting a swarm. \todo[inline]{invest vs donate. I think we need to stick to just one of them.}
-
-% incentive -> various, centralized, decentralized. Complicated or not. modifying bittorrent protocol? -> not standard 
-
-\section{Optimizing resource}
-To gain credit, seeding is necessary. However, users are forced to seed for excessively long time to maintain adequate credit \cite{2013:survivepriv:jia}. \citeauthor{2013:survivepriv:jia} also stated that this activity is commonly practiced although it is not productive. By seeding unproductively, user wastes his resources, such as bandwidth, storage capacity, and computer power.
-
-In larger scale, if we meant to seed a lot of torrents, for example, a million, the bottleneck occurred will be more fundamental. \citeauthor{2012:milliontorrent:arvid} shows an example how costly the \textit{announce} request accompanied by \textit{response} payload can be. Seeding 1 million torrent with announce once per every hour, which is half of the default interval, need 130 kB//s upload and 75 kB//s download bandwidth constantly \cite{2012:milliontorrent:arvid}. This value is significant for most of common Internet connection.
-
-\todo[inline]{expand:?}
-
-%\\
-%Anonymous Relaying performance in Tribler \cite{2015:onionroutetribler:stokkink}\\
-%Significant portion when seeding million torrents \cite{2012:milliontorrent:arvid}
-%
-%check swarm scrape -> multiple research -> based on dump logs
-
-% piece population study -> http://ieeexplore.ieee.org/document/4410992/?arnumber=4410992
-% related : Legout's work
-
-% characteristics : http://www.sciencedirect.com/science/article/pii/S1389128610003622
-
-\section{Research Objective}
-The main objective of this thesis is to implement and extend credit mining system (CMS) in Tribler. There was prior work on CMS with basic capabilities described in \cite{2015:creditmining:capota}. This thesis also based on prior work reported in  \cite{2013:investmentcm:capota} and  \cite{2014:bwmarket:capota}. 
-
-The next step of credit mining system is to fully integrate it with Tribler. Currently CMS is in broken state with its incompatibility with Tribler. There is minimal use of Tribler feature such as anonymity and social feature. The prior work on CMS will be elaborated in detail in section \ref{section:cmprior}. The implementation will consider user activity and its experiment will be conducted in production level. With this in mind, in this thesis we tried to answer the following research question : 
-
-\noindent{
-\\
-\textit{How do we fully incorporate credit mining system in Tribler?}
-\\}
-
-In order to answer the question, we formulate technical challenge that need to be solved. The challenges include engineering and performance evaluation aspect. The questions are the following : 
-
-\begin{enumerate}
-	\item \textit{What is the effect of mining in background for end-user?}
-		\\ In the prior work, a \textit{helper} system was exist. However, either it was limited to one role per peer or all the peer in the swarm have single role. While this approach is reasonable, it is unlikely that a peer will stick to one behavior. A peer may download normally from a swarm in one time, while decide to graciously help another swarm in other time.
-		
-	\item \textit{How do we take advantage of unused bandwidth in Tribler client in non-disruptive manner?}
-		\\ Downloading from \bt~network may or may not consume all of the peer bandwidth. If a user download from many swarm simultaneously, he has higher chance of utilizing his bandwidth to the most. Otherwise, the bandwidth is wasted. In the previous work, it is assumed that CMS will consume all the bandwidth. Naturally, it took part of the bandwidth and reduced user's experience. CMS address this issue by proposing activity-aware mechanism. The purpose is to get the most out of the bandwidth without disturb user of his own activity.
-		
-%	\item \textit{How is the performance of continuous-automatic\todo{perhaps +anonymous}~ mining?} 
-%		\\ Several credit mining performance have been discussed in \cite{2015:creditmining:capota} and \cite{2014:bwmarket:capota}. With alteration of the mechanism, it is natural to reevaluate the system. It is also important to study, if any, the drawbacks occurred with the integration.
-	\item \textit{How to prospect swarm and what is good investment?}
-		\\ The idea of CMS is to help undercapacity swarm while at the same time to get credit for uploading data. Finding which swarm that might have high return is called \textit{prospecting}. \textit{Investing}, specifically, consider prospecting in limited resources as additional requirement. Resource can be in several forms such as bandwidth, memory, or storage. Although the term ``good'' may be relative, we intend to show the efficiency of credit mining from different aspect.
-		
-	\item \textit{What is the effect of credit mining system in live production environment?}
-		\\ While previous question address local effect to user, this questions whether automatically mining or donating bandwidth can lead to increasing swarm capacity. Many characteristic of swarm start form low seeder, practically dead swarm, and new published swarm will be considered. Does credit mining really has positive impact on the swarm?
-		
-	\item \textit{What properties in Tribler that CMS can use to improve the experience and how?}
-		\\ Tribler consists of multiple modules. In section \ref{section:tribler} some of the features will be discussed. To fully integrate CMS with Tribler, it is intriguing to understand what Tribler client can offer to improve user experience in CMS. Specifically, we will focus on the anonymity and Tribler torrent collection within its channel.
-\end{enumerate}
+The focus on this thesis is to introduce credit mining system, a system to automatically upload prospected files. This system tries to find a collection of files which give relatively high reward if it uploaded in the future. As the system is implemented to increase user experience, it is implemented in such a way that it will not disturb any kind of user activities. Balancing between gaining high reward, consumed resource, and freeriding prevention become a key question of this thesis work.
 
 \section{Document Structure}
-This thesis is structured as follows. Chapter 2 discusses related work to the problem and solution proposed. Chapter 3 presents the design of credit mining system integrated with Tribler. Implementation of the mechanism and it's experiment will be elaborated in chapter 4. Chapter 5 shows performance of credit mining system. At the end, chapter 6 concludes the work mentioning possible future work.
+This thesis is structured as follows. Chapter 2 discusses problem we intend to solve and related work of it. Chapter 3 presents the design of credit mining system integrated with Tribler. Implementation of the mechanism and it's experiment will be elaborated in chapter 4. Chapter 5 shows performance of credit mining system. At the end, chapter 6 concludes the work mentioning possible future work.
 
 

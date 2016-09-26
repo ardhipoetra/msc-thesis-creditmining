@@ -1,0 +1,55 @@
+\chapter{Economics in \bt}
+
+As mentioned before, \bt~community can be viewed as social networking. Each peer represents a user. A user has \textit{needs}, which is to download a file, to be fulfilled. A file is provided by another user who has different need. This situation creates supply and demand as in traditional economics. This section will discuss supply and demand condition in \bt~system and its misalignment problem. Another issue which related to credit distribution that leads to system seize-up will be elaborated afterward. Also, it is important to mention how balanced system is desirable to sustain the swarm while no wasted resource on user.
+
+Supply and demand for both public and private \bt~communities have been studied by \citeauthor{2009:demandsupplyres:andrade} in \citeyear{2009:demandsupplyres:andrade}. \citeauthor{2009:demandsupplyres:andrade} shows that user who contribute more to the community, actually consume a lot from it. This explains that \bt~users are not altruistic enough to seed continuously. Although a significant amount of demand is successfully served by the community, there is only a few swarm that does not suffer from contention. Two reasons \citeauthor{2009:demandsupplyres:andrade} suggested are: (i) an asymmetric number of seeder and leecher, which seeder cannot compensate; and (ii) lack of incentive mechanism in the higher level aside from \bt~\textit{tit-for-tat}. 
+
+In public community, there is less supply compared to private community which enforce SRE \cite{2009:demandsupplyres:andrade}. This affects a file longevity because user seed longer in private community. If this behavior happened in long period, it might produce significant imbalance on supply and demand as seeder kept seeding a particular torrent without switching to another swarm. This phenomenon is accumulated by existing of \textit{flashcrowd} effect. Flashcrowd effect is the sudden increase in resource demand due to various reason. Newly published torrent is one of the reasons where flashcrowd effect take place \cite{2013:swarmevolution:su}. These misalignments between supply and demand can worsen the downloading experience in \bt.
+
+Individual and community performance must be balanced with each other.   \citeauthor{2013:survivepriv:jia} also mentioned the oversupply swarm situation which limits the possibility of giving higher bandwidth allocation for users \cite{2013:survivepriv:jia}. Therefore, it is important for user to choose which community he want to seed to balance those interest.
+
+\todo[inline]{cut}
+
+The use of credit in \bt~environment must be implemented with utmost care. \citeauthor{2010:crashsustain:rahman} showed that credit dynamics in P2P community, especially \bt, can lead to system seize-up. There are three statuses observed: \textit{crash}, \textit{crunch}, and \textit{sustain}. Crash and crunch is the condition where there are too much credit and lack of credit, accordingly \cite{2015:sustainabilitypt:vinko}. To preserve swarm sustainability, there are two aspects that need to be considered. The first one is the swarm condition such as file size and initial credit distribution \cite{2015:sustainabilitypt:vinko}. \citeauthor{2015:sustainabilitypt:vinko} showed that large file size could decrease the sustainability of a swarm. As for initial credit configuration, it depends on the community itself. The wrong amount can crash the system, while with the right amount overall throughput can increase. Secondly, it is the peer behavior \cite{2010:crashsustain:rahman}. \citeauthor{2010:crashsustain:rahman} concluded that selfish peer who only upload in order to continue downloading (freeriding) can badly harm the swarm. Moreover, crash and crunch situation can only be solved with external intervention.
+
+\todo[inline]{invest vs donate. I think we need to stick to just one of them.}
+
+% incentive -> various, centralized, decentralized. Complicated or not. modifying bittorrent protocol? -> not standard 
+
+%\section{Peer-to-peer economics}
+% Some research has been conducted to tackle performance degradation in a swarm.
+% some to increase throughput
+%\todo[inline]{repost like in problem description?}
+
+\section{P2P currency and incentive}
+In social economy, it is necessary to define the transaction unit used between the user. In this thesis, we define it as ``credit''. ``Wealth'' is a collection of stored credit on a particular user. Several researches defined credit depend on the case they intend to solve. \citeauthor{2012:economicbt:kash} defined one in his case as \texttt{4 x upload\_bytes - download\_bytes} which is the amount of user can download respecting to DIME share ratio requirement. The credit itself is asymmetrical. From the previous case, for example, if a byte sent from A to B, A will deducted 1 credit, while B will be rewarded by 4 credit. A number of owned credit usually stay linear with another metric called ``reputation'', that is, high credit lead to high reputation as well. Reputation shows how trusted and dependable a user is. 
+
+In his work, \citeauthor{2012:economicbt:kash} defined many economic terms suitable in \bt~community. The \textit{price} of a file is the amount of credit deducted from downloader's wealth. This, in many cases, the same amount uploader will receive and it depend on the size of the file. Commonly, the price per bytes is the same for all the file in the community. However, \citeauthor{2012:economicbt:kash} suggest that a community should carefully declare different price for different files. One way to do it is by lowering the price for the old content, or by defining price depend on the availability and capacity \cite{2012:economicbt:kash}. Another introduced term is \textit{resale value}. Resale value is the amount of \textit{gross} credit one will get by uploading a file. In DIME case, it is 4 times uploaded bytes. In other words, resale value is the amount of return one can expect by uploading a file. We saw this mechanism as a way to incentivize user. Because by uploading one byte, a user can get 4 credit which can be used to spend/download 4 bytes.
+
+Incentive mechanism in peer-to-peer network is essential as it is one of the property to increase swarm performance. This statement valid in all kinds of p2p network. \citeauthor{2015:incentivep2pgame:kang} proposed an incentive mechanism for dynamic and heterogeneous peer with game theory. They take peer capabilities and selfish nature as consideration. The mechanism targeted at wireless and low computing peer which always aim to maximize its own benefit through its credit system. In their system, each peer can set a price for service it provides. The buyer (downloader), in this case, able to negotiate with the seller (uploader) regarding the content price and its bandwidth allocation. This research objective is to maximize the \textit{performance satisfaction factor} where occurred after the transaction \cite{2015:incentivep2pgame:kang}. On the other side, especially in \bt~network, \citeauthor{2010:effortincentive:rahman} proposed effort-based incentive to advocate fairness between peers. They believe that current incentive system disfavor slow peers and eventually will decrease overall performance. In this system, user awarded based on its effort, which is relative on its capacity. This mechanism need alteration in \bt~existing policy on unchoke mechanism and peer selection. However, there is an increasing performance. Download speed for slow peers increase up to 63\% at the expense of decreasing speed for fast peer at 4\%.
+
+%Limitation of decentralized incentive (upper bound) \cite{2011:limitincentive:meulpolder}.\\
+
+Unstable credit system in p2p \cite{2015:sustainabilitypt:vinko}, solve by \cite{2010:crashsustain:rahman}.
+
+\section{Tackling free rider problem}
+Issue discussed in \cite{2000:freeridegnutella:adar}.\\
+Bittorrent handle this by tit-for-tat \cite{2003:bittorrent:cohen}.\\
+The behaviour \cite{2015:freeriderinbtcommunity:das}.\\
+
+Require the change of the system :  \cite{2008:givetogetvod:Mol}. 
+
+Another problem : tragedy of the commons \cite{1968:tragedycommon:hardin}. Can solve by reputation \cite{2002:reputationtotragedy:milinski}
+
+\section{Supply and Demand}
+Demand and supply in bittorrent environment \cite{2009:demandsupplyres:andrade}. \\
+Tracking back, generally, the core of credit mining try to solve supply and demand misalignment. \citeauthor{2011:interswarm:capota} in \citeyear{2011:interswarm:capota} showed that in private community \cite{2011:interswarm:capota}.\\
+
+
+\section{Prospecting and Investment}
+\todo{moved from credit mining subsection}
+Recent work on helping other user or increasing downloading performance using \bt~ has been done. \citeauthor{2014:cloudseed:leon} uses \bt~ protocol to increase user download speed and at the same time reduce datacenters load. They analyze which swarm or file to help using user bandwidth information and number of connected user\cite{2014:cloudseed:leon}. From another perspective, \citeauthor{2015:coalitionbt:zhang} introduced the \textit{coalition} between \bt~ peers. Coalition is a set of peers that cooperate each other in regards to \bt~policy to minimize download completion time. They also propose coalition-compatible choking strategy to replace the current \bt~one. This research lead to significant performance improvement within the coalition \cite{2015:coalitionbt:zhang}. Although not using \bt~protocol, in \citeyear{2009:p2phelp:he}, \citeauthor{2009:p2phelp:he} proved that helper peer also can improve the streaming capacity in P2P system\cite{2009:p2phelp:he}. \citeauthor{2016:gameauctionp2pstream:mostafavi} extend this work by introducing auction aspect for uploader to choose which user will receive the bandwidth he donate \cite{2016:gameauctionp2pstream:mostafavi}. \citeauthor{2016:gameauctionp2pstream:mostafavi} used game-theory to propose new framework in uncooperative peers with maximizing the credit gain for helpers.
+
+Crawl bittorrent network \cite{2011:yoshida:crawlbtnet}. More can be seen in \cite{2010:btworld:wojciechowski}.
+
+Resale value \cite{2012:economicbt:kash} related to torrent age. 
