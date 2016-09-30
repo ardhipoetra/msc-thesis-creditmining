@@ -4,11 +4,66 @@
 How to measure swarm by looking at Swarm evolution \cite{2013:swarmevolution:su}.
 Helper in swarm without need of human intervention \cite{2014:bwmarket:capota}. Aligning supply and demand of bandwidth
 
+\section{Credit Mining Main Components}
+
+\begin{itemize}
+\item general flow
+\item similarity check
+\end{itemize}
+
+\subsection{Mining Sources}
+\begin{enumerate}
+	\item rss
+	\item channel
+	\item directory source
+\end{enumerate}
+
+\subsection{Swarm Selection}
+ policies : 
+\begin{enumerate}
+	\item random
+	\item swarm age
+	\item seeder ratio
+\end{enumerate}
+
+\subsection{Prospecting Methodology}
+prospect a swarm : 
+\begin{enumerate}
+	\item N-piece
+	\item peer translation (peer info to swarm info)
+\end{enumerate}
+
+\subsection{Resource Optimization}
+\begin{itemize}
+	\item starvation prevention, no immediate stopping
+	 \item fallback mechanism (for now)
+\item 	 source blacklisting
+\item 	 resume downloading (cache)
+\item 	 archival mode
+\end{itemize}
+
+
 \section{Tribler integration}
 Tribler is well known for its anonymity and secure interface on top of \bt~ network. In 2014, Tribler published a specification on its anonymity feature\footnote{\url{https://github.com/Tribler/tribler/wiki/Anonymous-Downloading-and-Streaming-specifications}}. It uses Tor-like onion routing with purely distributed mechanism. A year later, \citeauthor{2015:tunnel:ruigrok} on his work completed the \textit{tunnel community} which emphasize end-to-end encryption in Tribler. This comes with several drawbacks. The most important one is performance degradation. Adding layers of privacy comes with increasing the amount of cryptography operation which slows down end-to-end downloading activity \cite{2015:tunnel:ruigrok}.
 
+\subsection{Experience enhancement}
+\begin{itemize}
+\item  aware user download, priority mehcnism
+\item  enable/disable relaxation
+\item single click choose channel
+\end{itemize}
+
+\subsection{Anonymous and secure mining}
+\begin{itemize}
+\item  usage of tunnel community
+\item  multichain?
+\end{itemize}
+
 \section{Libtorrent}
 Another Tribler dependency is \textit{libtorrent}\footnote{\url{http://libtorrent.org/}}. With \bt~is just a collection of specification, it free to be implemented with any languages. One of the implementation in \texttt{C++} is \textit{libtorrent}. \textit{libtorrent} also has \texttt{python} binding which the same language as Tribler implementation. \textit{Libtorrent} started in 2003 by Arvid Norberg. \textit{Libtorrent} is used by many torrent client such as Deluge, qBittorrent, Free download managers, and many others.
+
+\subsection{Priority Management}
+priority in libtorrent. Unchoke round. Bandwidth control
 
 \subsection{Share Mode}
 One of the crucial feature used in this work is \textit{share mode} \footnote{Core code of share mode can be found in \url{https://github.com/arvidn/libtorrent/blob/master/src/torrent.cpp\#L9586-L9727}}. Initial work performed by \citeauthor{2015:creditmining:capota} also used this feature\cite{2015:creditmining:capota}. By enabling share mode, it means that one is not interested in downloading the file, but gaining higher share ratio. It is done by download as little as possible and upload as much as possible. Share mode only download a torrent where it has sufficient capacity. A torrent downloaded in share mode may never finish as \textit{libtorrent} only download piece of a torrent which satisfied the share mode requirements. Share mode can be enabled per torrent basis.
