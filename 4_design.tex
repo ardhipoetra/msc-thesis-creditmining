@@ -9,13 +9,11 @@ In this chapter, the design of credit mining system is presented. This system co
 \section{Credit Mining Main Components}
 \label{section:cmcomponents}
 
-Auto. Helper in swarm without need of human intervention \cite{2014:bwmarket:capota}. Aligning supply and demand of bandwidth
+Credit mining system is intended to do its task automatically with minimal user intervention. The way this system designed is to align supply and demand of chosen swarm. Short term advantage of this approach is to gain credit by minimal download and maximize upload. In the long term, this potentially increase overall performance of other user as well.
 
-\begin{itemize}
-\item general flow
-\item similarity check
-\end{itemize}
+The system can be implemented beside any torrent client. In Figure \ref{fig:cmcomponents}, it shown the compulsory elements and the relation between \textit{credit mining system} and \textit{torrent client}. Currently, we assume that every torrent client also track how much data a user has been downloaded and uploaded. We called this tracking history as \textit{credit storage} or \textit{bank}. Naturally, any torrent client must have \textit{downloading module} as well. Other dependency are te \textit{libtorrent} library. Credit mining system will use some of the \textit{libtorrent}-specific function. This function is not part of the \bt~Enhancement Protocol (BEP) which define the standard of \bt~protocol that need to be implemented. Other required feature is the ability of discovering peer by all method (DHT, PEX, LSD, etc). In some cases, peer discovery function is disabled for security reasons. While disabling one should not affect credit mining system, it will reduce the prediction and overall performance.
 
+Credit mining system consists of several elements. First is the \textit{credit mining manager}. The \textit{manager} receives the \textit{settings} from user in the initial phase. To control mining process, user can only interact with value at \textit{settings} elements. User also limited to only add and remove \textit{mining source}. Each of the source will be assigned with a \textit{miner} depend on the type of the source. Miner also has sub-elements as part of the system. In-depth explanation of mining source and miners will be discussed in Section \ref{section:msource}. We introduce the \textit{predownload} mechanism as a way to evaluate a source early. This mechanism is launched by the manager instead of miner as it only happen during \textit{early propecting stage}. Predownload mechanism and prospecting methodology in general will be discussed in Section \ref{section:prospection}.
 
 \begin{figure}[ht]
 	\centering
@@ -24,7 +22,33 @@ Auto. Helper in swarm without need of human intervention \cite{2014:bwmarket:cap
 	\label{fig:cmcomponents}
 \end{figure}
 
+% general flow
+First, user can change the default settings used in the credit mining system. Some can not be changed when its already running. Table \ref{tbl:cmsettings} shows the settings used in this system. 
+
+\begin{table}[]
+	\centering
+	\caption{Credit mining settings}
+	\label{tbl:cmsettings}
+	\begin{adjustwidth}{-1.5cm}{}
+	\begin{tabular}{|p{1cm}|p{4cm}|p{7cm}|p{2cm}|}
+		\hline
+		\rowcolor[HTML]{EFEFEF} 
+		No. & Name & Description & Changeable at runtime \\ \hline
+	1 & \textit{max\_torrents\_active} & The maximum number of simultaneous swarm that will be downloaded & Yes \\ \hline
+	2 & \textit{max\_torrents\_per\_source} & The maximum number of stored torrent in a miner that will be considered for mining & Yes \\ \hline
+	3 & \textit{source\_interval} & The interval needed to check for updates in the swarm & Yes \\ \hline
+	4 & \textit{swarm\_interval} & The interval to re-evaluate swarm and start/stop swarm & Yes \\ \hline
+	5 & \textit{share\_mode\_target} & Libtorrent share mode target (See Section \ref{section:sharemode}) & No \\ \hline
+	6 & \textit{policy} & The policy used in mining (See Section \ref{section:prospection}) & No \\ \hline
+	7 & \textit{logging\_interval} & The interval for logging, for debugging purpose & No \\ \hline
+	8 & \textit{tracker\_interval} & The interval to check for a new peer by peer discovery methods & No \\ \hline
+	9 & \textit{timeout\_torrent\_activity} & The maximum time threshold to mark a swarm as 'inactive' & Yes \\ \hline
+	\end{tabular}
+	\end{adjustwidth}
+\end{table}
+
 \subsection{Mining Sources}
+\label{section:msource} 
 Currently, credit mining can accommodate three types of sources. There are directory source, RSS source, and channel source. In credit mining system, one source is assigned to one miner. The miner will start working the moment the source is defined and added to the manager. A miner periodically perform checking and other operations on all the torrents in the source. The operation that run in specified interval implemented differently for each of the source type. 
 
 First type of source which called \textit{directory source}, is very straightforward. It takes a path as an argument and verify it before run the miner. The miner starts by looking at all the file in specified directory that have \texttt{.torrent} file type. Each of the file is examined and validated. Corrupt or invalid file will be discarded and deleted automatically from the disk. To keep the performance and prevent disk bottleneck, the miner sort the files alphabetically and put it into queue one by one. Miner periodically monitor both the directory if there is a new file and the queue to assign it to the manager. Miner eventually will pop an item from the queue, build a suitable format for mining, and notify manager to include this swarm.
@@ -38,6 +62,7 @@ In \textit{RSS source}, we assume that the RSS link user provided is available. 
 The flow of channel source is quite different with other type of source. It is tailored to follow Tribler specification which can change in the near future. Provided the identifier of a channel, miner will continuously try to find and join the channel in \textit{AllChannel}. By joined the channel, miner can get the list of torrents and other of its properties. After miner joined the channel, the swarm information will be handled and downloaded by Tribler. What miner do is to monitor the local database whether a new data has been fetched and there is a space for adding possible new torrent to the manager. Providing the swarm information, miner will download the \texttt{.torrent} file. It can be downloaded by using several options such as DHT, magnet link, or download from Tribler peers using TFTP (Trivial File Transfer Protocol). Downloaded \texttt{.torrent} will be stored in Tribler database. Afterwards, the mining format will be built and manager will be notified of a ready swarm.  
 
 \subsection{Prospecting Methodology}
+\label{section:prospection}
 Prospecting a swarm is one of the key elements of credit mining system. The prospecting module can be divided into two main stage, named early and live prospecting. Both of the stages rely on the swarm measurement by looking at its evolution \cite{2013:swarmevolution:su}. 
 
 Early prospecting stage is important to decide which swarm that need to be mined. Wrong or sub-optimal decision will lead to low credit to be mined and less effect on the swarm. In a case where the miner decide to choose a particular swarm, then it will optimistically find more information before it switch to another swarm if the decision is not beneficial. This will result with an unnecessary overhead on the miners as a whole.  
