@@ -4,7 +4,79 @@
 % section overview, main components. Libtorrent as dependency. 
 The goal in this thesis is to implement and evaluate a system where it can be used to both invest credit and improve swarm performance. In this thesis, we introduce ``Credit mining system'', an automatic investment framework on swarm with multidimensional gain. With credit mining system, locally, a user can gain credit with internally limited bandwidth allocation without any intervention needed. The credit can be in many forms such as share ratio (upload-to-download ratio), uploaded amount, effort based credit, and many other. From higher perspective, credit mining system will help a swarm to keep alive by providing integral pieces to the peer who need it. Although credit mining system will be implemented in Tribler system, it is possible to apply this feature to any file-sharing system.
 
-In this chapter, the design of credit mining system is presented. This system consists of several subroutines which will be explained afterwards in section \ref{section:cmcomponents}. Under Tribler implementation, credit mining system heavily relied on \texttt{share mode} module of \textit{libtorrent}. \texttt{Share mode} is a module which can be activated as an intent to helping a swarm instead of normal content downloading. This module will be explained in detail in section \ref{section:sharemode}. The rest of the section \ref{section:libtorrent} explain other relevant, yet important module that credit mining system can exploit.
+Firstly, the dependencies of credit mining system which is \textit{libtorrent}'s s\textit{hare mode} will be elaborated. \texttt{Share mode} is a module which can be activated as an intent to helping a swarm instead of normal content downloading. This module will be explained in detail in section \ref{section:sharemode}. The rest of the section \ref{section:libtorrent} explain other relevant, yet important module that credit mining system can exploit. Afterwards, the design of credit mining system is presented. This system consists of several subroutines which will be explained afterwards in section \ref{section:cmcomponents}. 
+
+\section{Libtorrent}
+\label{section:libtorrent}
+With \bt~is just a collection of specification, it free to be implemented with any languages. One of most popular implementation is \textit{libtorrent}. \textit{Libtorrent} is written in \texttt{C++} and adopt open-source policy. \textit{libtorrent} also has \texttt{python} binding which the same language as Tribler implementation. \textit{Libtorrent} started in 2003 by Arvid Norberg and it implemented most of the \bt~specification. Most of the crucial specification such as DHT, IPv6 tracker, PEX, magnet link, multi-tracker, webseed, and many others has been implemented. That is why \textit{libtorrent} is widely used by many torrent client such as Deluge, qBittorrent, Free download managers, and many others.
+
+In this section, we will elaborate some of the \textit{libtorrent} feature that used in credit mining system and within our scope. How priority is managed within \textit{libtorrent} will be explained. After that, \textit{share mode} as the core function we needed is described in detail. The relation to credit mining system with it will be explained to both of them.
+
+\subsection{Priority Management}
+Determining which part of the file that needed to be downloaded is central component in \bt~implementation. By default, \textit{libtorrent} will look for rarest piece available in the swarm. However, it is possible to change this behavior. \textit{Libtorrent} provides an API with high granularity. Within a \textit{libtorrent} session, a swarm may have different priority compared with other swarm. Higher priority means higher chance to get unchoked. It is done by enlarging peer's bandwidth who has that swarm. In this way, \textit{libtorrent} can always prioritize those peers, therefore, the particular swarm. 
+
+Going deeper into \textit{libtorrent} API, it is also possible to prioritize a particular files or pieces in a swarm as well. It is common to have multiple files assigned in a swarm. A file consists of many pieces. However, one piece may represent one or more file. In a swarm perspective, length of the piece is always same, except the last one. By prioritizing files, \textit{libtorrent} assigned all pieces correlated with that file. Assigning priority to a piece will affect how that piece will be chosen for downloading. By default, \textit{libtorrent} sort the piece by its availability. Therefore, it downloads the rarest piece first before anything else. The piece and file priority can be overridden by calling the API. There are 8 level of priority, with level 0 means never be downloaded. The levels are : 
+
+\begin{enumerate}[topsep=1pt,itemsep=0ex,partopsep=0pt,parsep=2pt]
+	\itemsep0em 
+	\item[0.] piece is not downloaded at all.
+	\item normal priority. How \textit{libtorrent} download it is depending on the piece availability.
+	\item higher than normal priority. \textit{Libtorrent} prefer this piece instead of other piece which has same availability
+	\item in partial piece mode, picker will prefer to pick this priority on top of other priority
+	\item in partial piece mode with the same availability, picker will pick this piece instead of \textit{3)}
+	\item this priority is the same as \textit{4)}
+	\item this piece is likely to be picked as long as the availability is more than 1
+	\item maximum priority. Picker will not consider availability and always prioritize this piece.
+\end{enumerate}
+
+Using the mentioned API, credit mining system independently prioritize part of the swarm with various conditions. As will be shown in Section \ref{section:optimization}, the system always prioritize the user downloading activity rather than its mining activity. In other condition, credit mining will trigger the idle mining activity and do an initial download part to measure the swarm. This feature shown in Section \ref{section:prospection}. 
+%Unchoke round. Bandwidth control.
+
+\subsection{Share Mode}
+\label{section:sharemode}
+One of the crucial feature used in this work is \textit{share mode} \footnote{Core code of share mode can be found in \url{https://github.com/arvidn/libtorrent/blob/master/src/torrent.cpp\#L9586-L9727}}. Initial work performed by \citeauthor{2015:creditmining:capota} also used this feature\cite{2015:creditmining:capota}. By enabling share mode, it means that one is not interested in downloading the file, but gaining higher share ratio. It is done by download as little as possible and upload as much as possible. Share mode only download a torrent where it has sufficient capacity. A torrent downloaded in share mode may never finish as \textit{libtorrent} only download piece of a torrent which satisfied the share mode requirements. Share mode can be enabled per torrent basis.
+
+Share mode algorithm works heuristically as it estimates the rarest piece available in the swarm based on participated peers. First, it tries to find whether there is a piece which nobody has (line \ref{alg:l_lts:missingp}). Note that in line \ref{alg:l_lts:disconnectpeers}, libtorrent disconnect some of the seeder because we need to connect to the leecher later. This case is considered if there are too many seeder in our connection pool. Next, the number of missing pieces is decreased linearly with the number of seeder. This is based on assumption that both of us and other seeder can upload at least one piece each (line \ref{alg:l_lts:reducemissing}). To keep the performance, downloading piece activity is stacked until more than 5\% of the number to be downloaded (line \ref{alg:l_lts:retdling}). To determine rarest piece, libtorrent count the number of peer that has that piece. The number of peer on the rarest piece is termed \textit{rarity}. Share mode ensure that we only download the rarest piece available in the network (line \ref{alg:l_lts:rarepc}). We end the prematurely routine if there are more number of piece to download compared to uploaded (line \ref{alg:l_lts:retdlenough}) or there are not enough peer to upload the rarest piece (line \ref{alg:l_lts:rareunable}). Both condition will prevent us to get positive share ratio. Finally, it will download randomly the rarest pieces if there are more than one option (line \ref{alg:l_lts:dlrare}). The algorithm presented in algorithm \ref{alg:ltsharemode}. 
+
+\begin{algorithm}[h!]
+	\caption{Libtorrent share mode algorithm}
+	\label{alg:ltsharemode}
+	\begin{algorithmic}[1]
+		\Require{$T$ as share mode target}
+		\Statex
+		\State{$missing\_piece = 0$}
+		\ForAll{$p \in connected\_peers$}
+		\If{$p$ is a $leecher$ $and$ $p$ is not in share\_mode}	
+		\State{$missing\_pieces$} += {$total\_pieces - pieces(p)$} \label{alg:l_lts:missingp}
+		\EndIf	
+		\EndFor
+		\If{$|connected\_seeders|$ in $connected\_peer$ $>$ $90\%$}	
+		\State disconnect excess seeder \label{alg:l_lts:disconnectpeers}
+		\EndIf
+		\State{$missing\_pieces$} -= {$2 \times |connected\_seeders|$}	\label{alg:l_lts:reducemissing}	
+		\If{$missing\_pieces \leq 0$}
+		\State \Return
+		\EndIf
+		\If{$num\_downloaded \times T > uploaded$} \label{alg:l_lts:retdlenough}
+		\State \Return
+		\EndIf
+		\If{$downloading > 5\% \times num\_downloaded$} \label{alg:l_lts:retdling}
+		\State \Return
+		\EndIf
+		\ForAll{$pc \in pieces()$}
+		\If{$pc$ not in $collected\_piece$ $and$ $peer\_count(pc) \leq rarest\_rarity$ }	\label{alg:l_lts:rarepc}
+		\State{$rarest\_rarity$} = {$peer\_count(pc)$} 
+		\State{$rare\_piece$.push($pc$)}
+		\EndIf	
+		\EndFor
+		\If{$|connected\_peers| - rarest\_rarity < T$} \label{alg:l_lts:rareunable}
+		\State \Return
+		\EndIf
+		\State download {$random(rare\_piece)$} \label{alg:l_lts:dlrare}
+	\end{algorithmic}
+\end{algorithm}
+
+There are several limitations on this feature as we observed. First, it only has single parameter which determine the desired target of share ratio. This limits the exploration and full use of share mode feature. Another issues are storage and network inefficiency. If enabled, share mode works by downloading popular piece of a particular torrent. This means few downloaded pieces could take a large storage. Share mode also did not check whether a swarm is efficient enough to perform this operation. It only tries to find popular pieces regardless of the swarm condition. It is highly possible that if a swarm is in poor capacity, the uploading rate is very low. The bandwidth used to check torrent pieces regularly is wasted and the ``investment'' will not go well. The biggest limitation of share mode is the probability of getting bottleneck because of its strict policy. In early stage of joining a swarm, share mode downloaded 1 piece at a time. This can result slower decision making and the rarity of pieces changed. 
 
 \section{Credit Mining Main Components}
 \label{section:cmcomponents}
@@ -223,79 +295,44 @@ Lower seeder ratio, as mentioned before, is useful to measure whether a swarm is
 
 Scoring policy starts with examining all the swarm in a particular miner. Then we decide the score individually as shown in line 2-5. \textit{Peer ratio} is the ratio of a number of peer in this swarm and total number of peers that we know from all the swarm. \textit{Availability} is defined as the number of complete copies of a piece. Non-seeder peer provide a subset of a piece and increase the overall of the availability. In this case, we add the \textit{availability} as the number of peer who has the rarest piece. Moreover, the fraction of piece who has more peer is also considered. It is impossible for \textit{availability} to be 0, as it means there is no one who have complete file. Maximum number of \textit{availability} is the number of peer itself. That means, all the peer has completed files. After the score was assigned, the activity of each peer on each of the swarm is calculated. The activity, stored in a list, is sorted increasingly. Then, first half of the sorted activity is marked as low activity, and given the lower activity score (line 14). Similarly happens with second half of the list, but with higher activity and higher score (line 16).
 
+Scoring policy is intended to be able to facilitate what user need in a simple way. This can be done by providing value to the multiplier. By default, the value of $M\_leech$, $M\_pratio$, and $M\_avail$ are 5, 3, and 4, respectively. We argue that the number of seeder is the most relevant parameter to mine a swarm. Then it is the piece availability or its distribution. In the other hand, we think the the number of peer is less relevant than other parameter. It is indeed important in a case where the number of seeder ratio is exactly the same. Although less relevant, mining a large swarm may increase the probability to meet with potential seeder. That is why we still take it into consideration. In default case, we weight the importance of seeder ratio the most compared to the others. Changing the multiplier also changing the behavior. For example, a user do not consider number of peers important, so he can set the multiplier for $M\_pratio$ as 0. 
+
 \subsection{Resource Optimization}
-In this section, we focus on several optimization that can be implemented in credit mining system. These optimization are optional and can be left out. However, as the system itself is not without flaws, an improvement to support this system is advantageous. In general, there are two categories of support : helping get more credit in swarm and improving system resource utilization.
+\label{section:optimization}
+In this section, we focus on several optimizations that can be implemented in credit mining system. These optimizations are optional and can be left out. However, as the system itself is not without flaws, an improvement to support this system is advantageous. In general, there are two categories of support : helping get more credit in swarm and improving system resource utilization. The summary of designed optimizations are shown in Table \ref{tbl:optimizations}.
+
+\begin{table}[t]
+	\centering
+	\caption{Credit mining optimizations}
+	\label{tbl:optimizations}
+	\begin{adjustwidth}{-1.5cm}{}
+		\begin{tabular}{|p{0.7cm}|p{4cm}|p{10cm}|}
+		\hline
+		\rowcolor[HTML]{EFEFEF} 
+		\hline
+		\textbf{No} & \textbf{Optimization}& \textbf{Short Description} \\ \hline
+		1  & Eliminate duplicates  & Removing identical files in swarm to mine \\ \hline
+		2  & Swarm blacklisting    & Avoid picking slow swarm that has been previously invested\\ \hline
+		3  & Swarm trigger    & Optimistically download new rarest piece if idle too long\\ \hline
+		4  & Starvation prevention & Immediately stop a swarm that idle for a long time and replace it with another one\\ \hline
+		5  & Fallback mechanism    & Always pick \textit{default policy} whenever no swarm started although there are slots available \\ \hline
+		6  & Reusing cache         & Reusing downloaded content when restarting the swarm instead start from nothing \\ \hline
+		\end{tabular}
+	\end{adjustwidth}
+\end{table}
 
 \subsubsection{Economic gain support}
-In preliminary work by \citeauthor{2015:creditmining:capota}, credit mining system able to distinguish duplicate content in the P2P communities. It is highly possible that an exact same file have different infohash. An infohash of a torrent can come from many aspects such as different piece size, categorized as private or public swarm, or even directory name of the files \cite{2015:creditmining:capota}. We used \textit{Levenshtein distance} to measure the different between one swarm and another by considering the files and its length. In the end, we only mine the one who has higher number of seeder. The swarm comparison executed whenever there are new swarm reported by the miners. By eliminating duplicates in P2P communities, the supply and demand of a particular file can be focused. By focusing supply and demand into few swarms, the performance of participating peer might be improved.
+In preliminary work by \citeauthor{2015:creditmining:capota}, credit mining system able to distinguish duplicate content in the P2P communities. It is highly possible that an exact same file have different infohash. An infohash of a torrent can come from many aspects such as different piece size, categorized as private or public swarm, or even directory name of the files \cite{2015:creditmining:capota}. We used \textit{Levenshtein distance} to measure the different between one swarm and another by considering the files and its length. In the end, we only mine the one who has higher number of seeder. The swarm comparison executed whenever there are new swarm reported by the miners. By eliminating duplicates in P2P communities, the supply and demand of a particular file can be focused. By focusing supply and demand into few swarms, the performance of participating peer might be improved \todo{Exclude archive mode in mihai's work because the implementation is not clear}.
 
 In prospecting, it is possible that not all the swarm prospected can have good results. Regardless of the policy used, every miners will try to find best swarm in their library. In \textit{scoring policy} for example, miner will always try to mine best swarm found although it has very low score. In \textit{seeder ratio policy}, as long as there are peers in the swarm, a swarm will have a chance to be mined. On one hand, it is difficult to measure a swarm without joining it first, that is by downloading and seeding in that swarm. On the contrary, optimistically mine swarm may lead to sub-optimal performance. We argue that this is not necessarily a bad thing. By \textit{swarm blacklisting}, low performance swarm can be flagged and avoided in a longer term. Miner periodically check the performance of its swarm. \textit{Swarm blacklisting} also run in that period. Miner watch the when a particular active downloading or uploading data. If no activity detected in a swarm in a long period of time, the miner will remove this swarm from its library, Note that the swarm has a chance to be added to library again after several rounds. Moreover, blacklisted swarm can also be recovered if the performance of the rest of the swarms are not better and it has fulfill its threshold time. 
 
-\begin{itemize}
-	\item OO similarity	
-	\item XX archival mode
-	\item OO swarm blacklisting
-	\item (opt) trigger shock swarm if idle
-\end{itemize}
+\todo[inline]{WIP:Trigger swarm if idle}
 \subsubsection{Improving performance}
+
+
 \begin{itemize}
 	\item starvation prevention, no immediate stopping
 	\item fallback mechanism (for now)
 	\item 	 resume downloading (cache)
 \end{itemize}
 
-
-\section{Libtorrent}
-\label{section:libtorrent}
-Another Tribler dependency is \textit{libtorrent}\footnote{\url{http://libtorrent.org/}}. With \bt~is just a collection of specification, it free to be implemented with any languages. One of the implementation in \texttt{C++} is \textit{libtorrent}. \textit{libtorrent} also has \texttt{python} binding which the same language as Tribler implementation. \textit{Libtorrent} started in 2003 by Arvid Norberg. \textit{Libtorrent} is used by many torrent client such as Deluge, qBittorrent, Free download managers, and many others.
-
-\subsection{Piece picker control}
-
-\subsection{Priority Management}
-priority in libtorrent. Unchoke round. Bandwidth control
-
-\subsection{Share Mode}
-\label{section:sharemode}
-One of the crucial feature used in this work is \textit{share mode} \footnote{Core code of share mode can be found in \url{https://github.com/arvidn/libtorrent/blob/master/src/torrent.cpp\#L9586-L9727}}. Initial work performed by \citeauthor{2015:creditmining:capota} also used this feature\cite{2015:creditmining:capota}. By enabling share mode, it means that one is not interested in downloading the file, but gaining higher share ratio. It is done by download as little as possible and upload as much as possible. Share mode only download a torrent where it has sufficient capacity. A torrent downloaded in share mode may never finish as \textit{libtorrent} only download piece of a torrent which satisfied the share mode requirements. Share mode can be enabled per torrent basis.
-
-Share mode algorithm works heuristically as it estimates the rarest piece available in the swarm based on participated peers. First, it tries to find whether there is a piece which nobody has (line \ref{alg:l_lts:missingp}). Note that in line \ref{alg:l_lts:disconnectpeers}, libtorrent disconnect some of the seeder because we need to connect to the leecher later. This case is considered if there are too many seeder in our connection pool. Next, the number of missing pieces is decreased linearly with the number of seeder. This is based on assumption that both of us and other seeder can upload at least one piece each (line \ref{alg:l_lts:reducemissing}). To keep the performance, downloading piece activity is stacked until more than 5\% of the number to be downloaded (line \ref{alg:l_lts:retdling}). To determine rarest piece, libtorrent count the number of peer that has that piece. The number of peer on the rarest piece is termed \textit{rarity}. Share mode ensure that we only download the rarest piece available in the network (line \ref{alg:l_lts:rarepc}). We end the prematurely routine if there are more number of piece to download compared to uploaded (line \ref{alg:l_lts:retdlenough}) or there are not enough peer to upload the rarest piece (line \ref{alg:l_lts:rareunable}). Both condition will prevent us to get positive share ratio. Finally, it will download randomly the rarest pieces if there are more than one option (line \ref{alg:l_lts:dlrare}). The algorithm presented in algorithm \ref{alg:ltsharemode}. 
-
-\begin{algorithm}[]
-	\caption{Libtorrent share mode algorithm}
-	\label{alg:ltsharemode}
-	\begin{algorithmic}[1]
-		\Require{$T$ as share mode target}
-		\Statex
-		\State{$missing\_piece = 0$}
-		\ForAll{$p \in connected\_peers$}
-		\If{$p$ is a $leecher$ $and$ $p$ is not in share\_mode}	
-		\State{$missing\_pieces$} += {$total\_pieces - pieces(p)$} \label{alg:l_lts:missingp}
-		\EndIf	
-		\EndFor
-		\If{$|connected\_seeders|$ in $connected\_peer$ $>$ $90\%$}	
-		\State disconnect excess seeder \label{alg:l_lts:disconnectpeers}
-		\EndIf
-		\State{$missing\_pieces$} -= {$2 \times |connected\_seeders|$}	\label{alg:l_lts:reducemissing}	
-		\If{$missing\_pieces \leq 0$}
-		\State \Return
-		\EndIf
-		\If{$num\_to\_downloaded \times T > uploaded$} \label{alg:l_lts:retdlenough}
-		\State \Return
-		\EndIf
-		\If{$downloading < 5\% \times num\_to\_downloaded$} \label{alg:l_lts:retdling}
-		\State \Return
-		\EndIf
-		\ForAll{$pc \in pieces()$}
-		\If{$pc$ not in $collected\_piece$ $and$ $peer\_count(pc) \leq rarest\_rarity$ }	\label{alg:l_lts:rarepc}
-		\State{$rarest\_rarity$} = {$peer\_count(pc)$} 
-		\State{$rare\_piece$.push($pc$)}
-		\EndIf	
-		\EndFor
-		\If{$|connected\_peers| - rarest\_rarity < T$} \label{alg:l_lts:rareunable}
-		\State \Return
-		\EndIf
-		\State download {$random(rare\_piece)$} \label{alg:l_lts:dlrare}
-	\end{algorithmic}
-\end{algorithm}
-
-There are several limitations on this feature as we observed. First, it only has single parameter which determine the desired target of share ratio. This limits the exploration and full use of share mode feature. Another issues are storage and network inefficiency. If enabled, share mode works by downloading popular piece of a particular torrent. This means few downloaded pieces could take a large storage. Share mode also did not check whether a swarm is efficient enough to perform this operation. It only tries to find popular pieces regardless of the swarm condition. It is highly possible that if a swarm is in poor capacity, the uploading rate is very low. The bandwidth used to check torrent pieces regularly is wasted and the ``investment'' will not go well.
