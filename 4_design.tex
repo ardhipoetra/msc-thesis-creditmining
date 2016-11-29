@@ -23,7 +23,7 @@ Credit mining system consists of several elements. First is the \textit{credit m
 \end{figure}
 
 % general flow
-First, user can change the default settings used in the credit mining system. Some can not be changed when its already running. Table \ref{tbl:cmsettings} shows the settings used in this system. 
+First, user can change the default settings used in the credit mining system. Some can not be changed when mining process run already. Table \ref{tbl:cmsettings} shows the settings used in this system. After user provide the setting and run the \textit{credit manager}, user can start mining by adding sources. A source usually consists of several swarms with different size, availability, and capacity. Each of the swarm will be assigned with one \textit{miner} that may have different type depends on the swarm itself. Before the miners start mining, \textit{predownloader} try to fetch swarm information as much as possible then give the results to the manager. Manager will propagate the swarm information to miners and let the miners decide which swarm to mine based on that information. Manager also monitor the main torrent downloader to adjust swarm's priority in miners. The credit gained from each of the miner will be reported to manager, then it forwards the results to credit storage in torrent client if necessary.
 
 \begin{table}[]
 	\centering
@@ -43,9 +43,14 @@ First, user can change the default settings used in the credit mining system. So
 	7 & \textit{logging\_interval} & The interval for logging, for debugging purpose & No \\ \hline
 	8 & \textit{tracker\_interval} & The interval to check for a new peer by peer discovery methods & No \\ \hline
 	9 & \textit{timeout\_torrent\_activity} & The maximum time threshold to mark a swarm as 'inactive' & Yes \\ \hline
+	10 & \textit{piece\_download} & The number of piece what will be downloaded in \textit{predownload} phase & No \\ \hline
 	\end{tabular}
 	\end{adjustwidth}
 \end{table}
+
+Credit mining system is designed to be highly customizable. Some of the components can be extended or replaced. For example, the policy used to select the swarm. Beside what we proposed, user can define the policy as long as it overrides a function that return which swarm to start and stop. For peer translating, it is possible to override the function considering peer list and its information as an input, while returning number of seeder and leecher. Some value in the settings can be adjusted to match user's need and resource. With higher memory available, it is desirable to mine many swarms in one time by changing \textit{max\_torrents\_active} parameter. By having large storage, increasing \textit{piece\_download} may result a better return.
+
+The rest of this section will discuss key points of credit mining system. Several mining source types are supported with different treatment from miners. Prospecting methodology on top of libtorrent share mode will be elaborated afterwards. The methodology consists of two integral stages. Each of the stage has their own mechanism and requirements. Lastly, we will discuss other components that can support credit mining system of its prospecting, performance, and credit gain. 
 
 \subsection{Mining Sources}
 \label{section:msource} 
@@ -122,7 +127,7 @@ To be able to fully decentralized, it is important to not rely on the tracker to
 
 The \textit{peer translation} receives list of peers as input and returns the number of seeder and downloader. This procedure is shown in Algorithm \ref{alg:peertrans1} and \ref{alg:peertrans2}. The manager will examine each of the peer like shown in \ref{alg:peertrans1}. We categorize a peer is seeder if it satisfy at least one of three conditions. The conditions are: it is only want to upload right now, it is 80\% finished with its download, and it is known to upload more data to us than downloading. In the other hand, we define a peer is a leecher if it satisfies at least one of three conditions, which is: it is interested in our pieces, it has unfinished download and able to download again another piece, and it is known to download more data from us than uploading. We called the phase where the analyzed peers are translated into number of potential seeder and leecher as \textit{interpretation} phase. This phase shown in Algorithm \ref{alg:peertrans2} which is the continuation of Algorithm \ref{alg:peertrans1}.
 
-\begin{algorithm}[]
+\begin{algorithm}[t]
 	\caption{Peer translation algorithm, analyzing phase}
 	\label{alg:peertrans1}
 	\begin{algorithmic}[1]
@@ -155,7 +160,7 @@ The \textit{peer translation} receives list of peers as input and returns the nu
 	\end{algorithmic}
 \end{algorithm}
 
-\begin{algorithm}[]
+\begin{algorithm}[t]
 	\caption{Peer translation algorithm, interpretation phase}
 	\label{alg:peertrans2}
 	\begin{algorithmic}[1]
@@ -182,7 +187,7 @@ In this thesis, we intend to extend those policies so it can be highly customiza
 
 Lower seeder ratio, as mentioned before, is useful to measure whether a swarm is undersupplied or not. This is particularly useful to \textit{help} a swarm. However, in small swarm, this attribute may not be relevant. Thus, a number of peer is considered as a scoring aspect. With the same ratio of seeder and peers, it is useful to mine a big swarm instead of the small one. There are many options to give our piece to. Another important aspect is the file availability of the swarm. In flashcrowd case, there are a significant amount of peer who do not have a large portion of the file. Comparing to another swarm which most of the leecher almost finished their download, mining this swarm will give higher credit and more beneficial to the community altogether. Last element that we considered is the activity of a swarm. It is preferable to mine a swarm whose some of the peers already download or upload any data from or to us. The reason behind this is because the underlying nature of \bt, it is possible that our prediction is wrong. The worst case happened when there are no peer interested with the piece we already have. In the other hand, if a peer already interacted with us before, there is a chance we will get chosen again in the future. Therefore, by putting this attribute into consideration, we want to minimize this problem.
 
-\begin{algorithm}[h]
+\begin{algorithm}[th]
 	\caption{Scoring policy algorithm}
 	\label{alg:scorep}
 	\begin{algorithmic}[1]
@@ -219,12 +224,24 @@ Lower seeder ratio, as mentioned before, is useful to measure whether a swarm is
 Scoring policy starts with examining all the swarm in a particular miner. Then we decide the score individually as shown in line 2-5. \textit{Peer ratio} is the ratio of a number of peer in this swarm and total number of peers that we know from all the swarm. \textit{Availability} is defined as the number of complete copies of a piece. Non-seeder peer provide a subset of a piece and increase the overall of the availability. In this case, we add the \textit{availability} as the number of peer who has the rarest piece. Moreover, the fraction of piece who has more peer is also considered. It is impossible for \textit{availability} to be 0, as it means there is no one who have complete file. Maximum number of \textit{availability} is the number of peer itself. That means, all the peer has completed files. After the score was assigned, the activity of each peer on each of the swarm is calculated. The activity, stored in a list, is sorted increasingly. Then, first half of the sorted activity is marked as low activity, and given the lower activity score (line 14). Similarly happens with second half of the list, but with higher activity and higher score (line 16).
 
 \subsection{Resource Optimization}
+In this section, we focus on several optimization that can be implemented in credit mining system. These optimization are optional and can be left out. However, as the system itself is not without flaws, an improvement to support this system is advantageous. In general, there are two categories of support : helping get more credit in swarm and improving system resource utilization.
+
+\subsubsection{Economic gain support}
+In preliminary work by \citeauthor{2015:creditmining:capota}, credit mining system able to distinguish duplicate content in the P2P communities. It is highly possible that an exact same file have different infohash. An infohash of a torrent can come from many aspects such as different piece size, categorized as private or public swarm, or even directory name of the files \cite{2015:creditmining:capota}. We used \textit{Levenshtein distance} to measure the different between one swarm and another by considering the files and its length. In the end, we only mine the one who has higher number of seeder. The swarm comparison executed whenever there are new swarm reported by the miners. By eliminating duplicates in P2P communities, the supply and demand of a particular file can be focused. By focusing supply and demand into few swarms, the performance of participating peer might be improved.
+
+In prospecting, it is possible that not all the swarm prospected can have good results. Regardless of the policy used, every miners will try to find best swarm in their library. In \textit{scoring policy} for example, miner will always try to mine best swarm found although it has very low score. In \textit{seeder ratio policy}, as long as there are peers in the swarm, a swarm will have a chance to be mined. On one hand, it is difficult to measure a swarm without joining it first, that is by downloading and seeding in that swarm. On the contrary, optimistically mine swarm may lead to sub-optimal performance. We argue that this is not necessarily a bad thing. By \textit{swarm blacklisting}, low performance swarm can be flagged and avoided in a longer term. Miner periodically check the performance of its swarm. \textit{Swarm blacklisting} also run in that period. Miner watch the when a particular active downloading or uploading data. If no activity detected in a swarm in a long period of time, the miner will remove this swarm from its library, Note that the swarm has a chance to be added to library again after several rounds. Moreover, blacklisted swarm can also be recovered if the performance of the rest of the swarms are not better and it has fulfill its threshold time. 
+
+\begin{itemize}
+	\item OO similarity	
+	\item XX archival mode
+	\item OO swarm blacklisting
+	\item (opt) trigger shock swarm if idle
+\end{itemize}
+\subsubsection{Improving performance}
 \begin{itemize}
 	\item starvation prevention, no immediate stopping
-	 \item fallback mechanism (for now)
-\item 	 swarm blacklisting
-\item 	 resume downloading (cache)
-\item 	 archival mode
+	\item fallback mechanism (for now)
+	\item 	 resume downloading (cache)
 \end{itemize}
 
 
