@@ -72,13 +72,13 @@ In integrating with Tribler, we emphasize the simplicity to both interact with c
 \subsubsection{User activity awareness}
 One important point to ensure user to keep using any system is to not disturb their activity. In a typical torrent client, non-altruistic user tend to only activate his client when downloading. Although credit mining system runs automatically, it is possible the system will find a potential swarm then actively download from it. For a user with limited bandwidth, we realize this could be a problem if this user realize his bandwidth that currently used is taken by credit mining system. In a long term, this may cause user to disable this system because of the potential intrusiveness. We define the \textit{user download activity} as the activity that intentionally initiated by user in order to participate or download content on the particular swarm. Usually, it is the true purpose of having torrent client. 
 
-\todo{Restructure the following}In response to that issue, on the integration with Tribler, we also implemented another module in credit mining system to adjust its mining activity to user download activity. Credit mining system periodically check whether there is an user downloading activity. If there is not any, then credit mining system can notify the miners to use all the bandwidth available. If there is an activity, user need to set the priority of credit mining download activity. By default, the priority of credit mining download activity will be reduced to one-third\todo{tentative}. This means, the swarm in the user download activity will get 3 times higher probability of bandwidth allocation compared to the one in credit mining download activity. The bandwidth distribution is not strictly in order, however, the priority is used as weight for it.
+\todo{Restructure the following}In response to that issue, on the integration with Tribler, we also implemented another module in credit mining system to adjust its mining activity to user download activity. Credit mining system periodically check whether there is an user downloading activity. If there is not any, then credit mining system can notify the miners to use all the bandwidth available. If there is an activity, user need to set the priority of credit mining download activity. By default, the priority of credit mining download activity will be reduced to one-third\todo{tentative : one-third/3 times}. This means, the swarm in the user download activity will get 3 times higher probability of bandwidth allocation compared to the one in credit mining download activity. The bandwidth distribution is not strictly in order, however, the priority is used as weight for it.
 
 %\subsubsection{Libtorrent tuning}
 %settings in libtorrent to accommodate credit mining <- removed it for now.
 
-\subsection{Anonymous and secure mining}
-\todo[inline]{untested. May skip this subsection. See .tex file for draft}
+%\subsection{Anonymous and secure mining}
+%\todo[inline]{untested. May skip this subsection. See .tex file for draft}
 %Tribler is well known for its anonymity and secure interface on top of \bt~ network. In 2014, Tribler published a specification on its anonymity feature\footnote{\url{https://github.com/Tribler/tribler/wiki/Anonymous-Downloading-and-Streaming-specifications}}. It uses Tor-like onion routing with purely distributed mechanism. A year later, \citeauthor{2015:tunnel:ruigrok} on his work completed the \textit{tunnel community} which emphasize end-to-end encryption in Tribler. This comes with several drawbacks. The most important one is performance degradation. Adding layers of privacy comes with increasing the amount of cryptography operation which slows down end-to-end downloading activity \cite{2015:tunnel:ruigrok}.
 
 % enable safe_seeding: when finished and in 'seeding' state. hops: download/upload via libtorrent proxy.
@@ -140,25 +140,66 @@ scenario_file = "creditmining_base.scenario"
 post_process_cmd = "gumby/scripts/post_credit_mining.sh"
 \end{verbbox}
 \begin{figure}[]
-%	\begin{adjustwidth}{-2cm}{}
 	\fbox{\theverbbox}
 	\caption{Configuration format example}
 	\label{fig:gumbyconf}
-%	\end{adjustwidth}
 \end{figure}
 
 \section{Credit mining experiment}
 \label{section:cmexp}
-The credit mining experiment covered two aspects : local and global. 
+We now focus on how the credit mining system will be evaluated by its performance. In general, there are two aspects we want to address. First one is how credit mining system can gain benefit to its user. This means a user is expected to get considerable amount of credit with small investment. The parameter for this experiment can be derived from how much user actually gain and how it compares to the investment they already had. Second perspective is finding out how the credit mining system can benefit the swarms as a whole. It can be done by monitoring the performance of each of the peers. If each of the peers performance are increasing, then the swarm itself have its capacity increased as well.
+
+\subsection{Experiment conditioning}
+The experiments were conducted in different scenario and architecture. For RSS source, we used etree.org (\url{http://bt.etree.org/rss/bt_etree_org.rdf}) and our custom RSS feed. We launced our RSS feed in \url{https://rss-creditmining.herokuapp.com/feeds/}. We put different kinds of swarm there from old but popular to recent but very few peers. Etree.org is a legal community that shares music with permission from authors. This community is relatively active and new published swarm usually has sufficient supply and demand for testing. In the custom RSS feed, we also publish the swarm in different period\todo{Do this}. This approach is important to limit the choice available for credit mining system either from prior or this work. 
+
+Beside putting the credit mining system in the wild, we also conducted an experiment where we can directly observe the swarm. This can be done in gumby by specifying a number of nodes, mechanism of swarm dissemination, and each of the node's activity. We created a swarm with dummy files as a content. This swarm then inserted into a particular \textit{Channel}. This \textit{channel} can be accessed from all the nodes using Dispersy. In the end, user can only get the metadata of this swarm such as files information, infohash, and other thing typically found in \texttt{.torrent} file. 
+
+In our controlled environment, a node can be categorized as publisher, seeder, downloader, or credit miner. A single node will act as a \textit{publisher} of this swarm. It creates \textit{channel} and dummy files, generates metadata, pushes it into the \textit{channel}, and seed for the rest of the experiment. Another node can help become a seed for the swarm if necessary. It need to copy files related to that swarm into their own directory via unthrottled connection. For other node, it can be either download or activate credit mining system. This \textit{channel} can be added to credit mining system as a mining source. As for downloaders, they can both start and stop downloading from a swarm identified by its name. 
 
 \subsection{Comparing performance with prior work}
+One checkpoint of this work is comparing the performance to prior work. In the prior work by \citeauthor{2015:creditmining:capota}, they used \textit{net upload gain} as a parameter to measure how many credit user already gain. Net upload gain is a difference between uploaded and downloaded bytes. Moreover, to measure the efficiency of credit mining system, they also defined \textit{normalized upload gain} which is the ratio between \textit{net upload gain} and total downloaded bytes. As an extension of this metric. \todo{add more metrics for comparison}
+
+The comparison experiment will be run for 12 and 24 hours\todo{may change}. As a note, prior work run its experiment for 2 days (48 hours) straight. Etree.org will be used as mining source because other sources are not compatible with the prior work. It is also not compatible with our experiment framework, gumby, to test in closed environment. The recommended parameter on prior work is by setting credit mining system with SeederRatio policy, target ratio 3, and 5 minute swarm interval although in their argument, setting target ratio as 1 gives higher net upload gain. In our experiment, we will use the same parameter and configuration. We will use this performance of credit mining system as \textit{base performance}. It will then referred from other experiment result. 
+
+The problem with running in the wild is the result may different for each time it was run. If we run the program in parallel, there is a possibility that it will intervene each other. Therefore, we will run the experiment in the following method. First, the experiment will be executed one after another. Our experiment will start first. Then, after it finished, the experiment from prior work will be run immediately. We run the program for 12 hours for both, and then for 24 hours after both of them finished. After all the execution completed, we will run both versions in parallel to find out if it intervenes one another. This phase will run for 12 and 24 hours. If necessary, the experiment will be run several times\todo{may change}. Two approach of interpreting the different results will be applied. First approach is ,we will count the average of the results. Other approach is to see the general trend of the result and pick up the majority as sample. 
+
+%\begin{itemize}
+%	\item old one use \textit{net upload gain}. etree.org for two day (48 hour). Test with 1 and half day.
+%	\item Best old one is SeederRatio with 5 minute with 1 ratio (gain higher upload gain). Optimal : 3 ratio.
+%	\item CM+boost : seederratio, 5 minutes, 3 ratio
+%	\item mihai 136 12 hour. runs first.
+%	\item cm 133. 12 hour. runs second.
+%	\item mihai 137, cm 134 : 12 hour. In parallel
+%\end{itemize}
+
 \subsubsection{New policy}
+%run same experiment as above but change the seeder ratio with scoring ratio. 
+After knowing the base performance of credit mining system, it is important to keep extending it. By the introduction of our new policy, scoring policy, we intend to compare it to the base performance. In this aspect, we will run two experiment. The first one is the same as previous experiment of etree.org but only change the policy and its parameters. It will be run for both 12 and 24 hours. The result of this experiment will be compared to both prior work and base experiment. 
+
+%run in closed environment. Compare with other policy.
+%The second experiment is executed in closed environment. We will observe both local gain of the miners and global benefit that occurred on the swarm. 
+
 \subsection{Predownload hit capabilities}
+Credit mining system has many limitations that comes from both resource and libtorrent limitation. Therefore, given a large number of swarms, it is impossible to mine all of them and get good results. Instead, credit mining system measure the swarm before start mining by \textit{predownloading}. However, not all the swarms in the Internet available for predownload. Some swarms are not complete (no one has complete files), only have \textit{webseeds}, and have invalid or duplicate content. This experiment will show how is the prospect of \textit{predownload} in the Internet on a large scale. 
+This experiment to check how is the availability torrent in the net. Current ready : 42
+Download only 4 pieces. How long it takes.
+
+\todo{do we need to include how many peers discovered as well?}
+exclude webseed and httpseed.
+compared 
+
 \subsubsection{Torrent crawler}
+link repo : \url{https://github.com/ardhipoetra/legal-torrent-crawler}. How this things works.
+
 \subsection{Experiment on user activity}
+goal : to find out if credit mining system can really prioritize user download activity. expectation : when mining without user activity, can download/upload up to max bandwidth. Otherwise, download/upload speed decreased when mining.
+
+The Latest try : 42. 
+Make all credit mining priority as 1 if there is a main activity. Commented out peer logging (reduce size)
 
 \section{Finding best parameters}
 \label{section:cmparamexp}
+
 \subsection{Multiplier in scoring policy}
 \subsection{Number of piece download}
 \subsection{Peer translation accuracy}
