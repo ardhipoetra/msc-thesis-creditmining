@@ -1,0 +1,50 @@
+\begin{figure}[h]
+	\begin{adjustwidth}{-2.5cm}{}
+		\begin{subfigure}[t]{0.7\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{pics/results/b133.pdf}
+			\caption{12 hour new experiment.}
+		\end{subfigure}
+		~
+		\begin{subfigure}[t]{0.7\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{pics/results/m136.pdf}
+			\caption{12 hour old experiment}
+		\end{subfigure}
+		\caption{New vs old experiments (run separately) result on 12 hour}
+	\end{adjustwidth}
+\end{figure}
+
+\begin{figure}[h]
+		\begin{adjustwidth}{-2.5cm}{}
+	\begin{subfigure}[t]{0.7\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{pics/results/b134.pdf}
+		\caption{12 hour new experiment.}
+	\end{subfigure}
+	~
+	\begin{subfigure}[t]{0.7\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{pics/results/m137.pdf}
+		\caption{12 hour old experiment}
+	\end{subfigure}
+	\caption{New vs old experiments (run in parallel) result on 12 hour}
+		\end{adjustwidth}
+\end{figure}
+
+\begin{figure}[h!]
+	\begin{adjustwidth}{-2.5cm}{}
+		\begin{subfigure}[t]{0.7\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{pics/results/b137.pdf}
+			\caption{24 hour new experiment.}
+		\end{subfigure}
+		~
+		\begin{subfigure}[t]{0.7\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{pics/results/m139.pdf}
+			\caption{24 hour old experiment}
+		\end{subfigure}
+		\caption{New vs old experiments (run in parallel) result on 24 hour}
+	\end{adjustwidth}
+\end{figure}
