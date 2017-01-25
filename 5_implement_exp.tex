@@ -1,4 +1,4 @@
-\chapter{Credit mining implementation and setup}
+\chapter{Credit mining implementation and experimental setup}
 \label{chp:implexperiment}
 In the previous chapter, we discussed the credit mining system design. The system can be implemented in any language with any interpretation of implementation. In this work, credit mining system implemented in Tribler, a python torrent client that was built in Delft University of Technology. Based on this implementation, we come up with the suitable experiment design to answer our research question in previous chapter. 
 
@@ -21,21 +21,22 @@ As part of the software engineering process, the credit mining code need to be p
 	\label{fig:cmpullrequest}
 \end{figure}
 
-As shown in Figure \ref{fig:cmpullrequest}, the first credit mining prototype was heavily discussed by 6 other participants and more than 450 comments. It also takes almost 3 months to accommodate all the feedbacks and reviews. The coverage of this integration worth more than 4200 added lines and 140 deletions. The code portion is quite balanced with 1425 lines goes to GUI part of the code, 1290 lines to the credit mining system itself, 1160 lines to the tests, while the rest to other Tribler components to accommodate credit mining system. At the time of merging, credit mining system passed all the necessary test such and able to run in Linux, MacOS, and Windows (both 32 and 64 bit).
+As shown in Figure \ref{fig:cmpullrequest}, the first credit mining prototype was heavily discussed by 6 other participants and more than 450 comments. It also takes almost 3 months to accommodate all the feedbacks and reviews. The coverage of this integration worth more than 4200 added lines and 140 deletions. The code portion is quite balanced with 1425 lines goes to GUI part of the code, 1290 lines to the credit mining system itself, 1160 lines to the tests, while the rest to other Tribler components to accommodate credit mining system. At the time of merging, credit mining system passed all the necessary test such and able to run in Linux, MacOS, and Windows (both 32 and 64 bit). It passed the necessary code coverage and allowed pylint violations. 
+
+To ensure the quality of the main branch, code submitted through pull request is tested by a unit test mechanism. There are two main category in the credit mining unit tests. First one is the tests that check its basic function. It includes the test of policy, peer translation, RSS parser, similarity function, and mining configuration and its dependencies. It also tests for the unwanted/error case and how credit mining system will respond. The second test is more complex because it emulates the whole credit mining flow. It tests each of the type of mining source (RSS, \textit{channel}, and local directory). For RSS source, the test deployed local server acting as RSS feeder. It also checks how credit mining system behave when RSS source is not exist or temporarily unavailable. As for \textit{channel} source, the test suite prepare the environment by create both local channel and torrent, insert torrent metadata into channel, and push created channel to \textit{AllChannelCommunity}. The test constructed to checks how the system handles when the channel is already in library or not and a situation where number of torrents in channel exceed the maximum number of torrent allowed in the credit mining system. 
 
 \footnotetext{Available in : \url{https://github.com/Tribler/tribler/pull/2064/}}
 \subsection{Experience enhancement}
-Credit mining system implementation is made publicly available for end user. It is important to encourage user to be as altruistic as possible. Therefore, in this system, we provide minimal interaction so non-altruistic user can be shown the effect of altruism and be convinced that this behavior is beneficial for both parties. In this part, we will elaborate the effort we have done on enhancing user experience of credit mining system on Tribler. As for comparison, Figure \ref{fig:oldcm} shows the only interface available from the previous work. In this version, it was not possible to add the mining sources except from the Tribler configuration file. 
-
-\begin{figure}[h]
+\begin{figure}[t]
 	\centering
 	\includegraphics[width=0.8\textwidth]{pics/old_cm.png}
 	\caption{The GUI for showing information from prior work \cite{2015:creditmining:capota}.}
 	\label{fig:oldcm}
 \end{figure}
 
-\subsubsection{Graphical user interface revampment}
+Credit mining system implementation is made publicly available for end user. It is important to encourage user to be as altruistic as possible. Therefore, in this system, we provide minimal interaction so non-altruistic user can be shown the effect of altruism and be convinced that this behavior is beneficial for both parties. In this part, we will elaborate the effort we have done on enhancing user experience of credit mining system on Tribler. As for comparison, Figure \ref{fig:oldcm} shows the only interface available from the previous work. In this version, it was not possible to add the mining sources except from the Tribler configuration file. 
 
+\subsubsection{Graphical user interface revampment}
 Start with the screen we called credit mining main window, it has similar interface compared with previous version. We improved the investment summary by adding more information of the mining source. The investment summary screen contains the swarms download/upload speed, amount of downloaded/uploaded, amount of seeder/leecher, and its identification. Figure \ref{fig:overview} shows this screen. In the same window, we also integrate an interface to easily add or remove mining sources. As mentioned in Section \ref{section:msource}, currently there are only 3 types of sources. Adding RSS and directory source can be done by clicking the upper left option. In the other hand, adding channel source can be done by put the mark in the check boxes in the source list. Figure \ref{fig:addsource} shows the example of adding directory source.
 
 \begin{figure}[t!]
@@ -150,6 +151,27 @@ post_process_cmd = "gumby/scripts/post_credit_mining.sh"
 \label{section:cmexp}
 We now focus on how the credit mining system will be evaluated by its performance. In general, there are two aspects we want to address. First one is how credit mining system can gain benefit to its user. This means a user is expected to get considerable amount of credit with small investment. The parameter for this experiment can be derived from how much user actually gain and how it compares to the investment they already had. Second perspective is finding out how the credit mining system can benefit the swarms as a whole. It can be done by monitoring the performance of each of the peers. If each of the peers performance are increasing, then the swarm itself have its capacity increased as well.
 
+%\begin{table}[h]
+%	\centering
+%	\caption{Experiment scheme}
+%	\label{tbl:expswarmperf}
+%	\begin{tabular}{|c|c|c|c|c|c|}
+%		\hline
+%		\textbf{300mb} & \textbf{1gb\_1} & \textbf{1gb\_2} & \textbf{5gb} & \textbf{Total peers} & \textbf{Event} \\ \hline
+%		0 & 0 & 0 & 0 & 1 & Publisher \\ \hline
+%		4 & 5 & 2 & 8 & 19 & Seeders \\ \hline
+%		10 & 5 & 10 & 3 & 28 & Wave 1 \\ \hline
+%		4 & 1 & 5 & 8 & 18 & Wave 2 \\ \hline
+%		7 & 10 & 10 & 7 & 34 & Wave 3 \\ \hline
+%		0 & 0 & 0 & 5 & 5 & 30min-1 \\ \hline
+%		0 & 0 & 5 & 0 & 5 & 30min-2 \\ \hline
+%		0 & 5 & 0 & 0 & 5 & 30min-3 \\ \hline
+%		5 & 0 & 0 & 0 & 5 & 30min-4 \\ \hline
+%		\hline
+%		30 & 26 & 32 & 31 & 120 & \textbf{Total Peers} \\ \hline
+%	\end{tabular}
+%\end{table}
+
 \subsection{Experiment conditioning}
 The experiments were conducted in different scenario and architecture. For RSS source, we used etree.org (\url{http://bt.etree.org/rss/bt_etree_org.rdf}) and our custom RSS feed. We launced our RSS feed in \url{https://rss-creditmining.herokuapp.com/feeds/}. We put different kinds of swarm there from old but popular to recent but very few peers. Etree.org is a legal community that shares music with permission from authors. This community is relatively active and new published swarm usually has sufficient supply and demand for testing. In the custom RSS feed, we also publish the swarm in different period\todo{Do this}. This approach is important to limit the choice available for credit mining system either from prior or this work. \todo{jenkins, DAS, specification}
 
@@ -157,31 +179,18 @@ Beside putting the credit mining system in the wild, we also conducted an experi
 
 In our controlled environment, a node can be categorized as publisher, seeder, downloader, or credit miner. A single node will act as a \textit{publisher} of this swarm. It creates \textit{channel} and dummy files, generates metadata, pushes it into the \textit{channel}, and seed for the rest of the experiment. Another node can help become a seed for the swarm if necessary. It need to copy files related to that swarm into their own directory via unthrottled connection. For other node, it can be either download or activate credit mining system. This \textit{channel} can be added to credit mining system as a mining source. As for downloaders, they can both start and stop downloading from a swarm identified by its name. 
 
-\subsection{Comparing performance with prior work}
-One checkpoint of this work is comparing the performance to prior work. In the prior work by \citeauthor{2015:creditmining:capota}, they used \textit{net upload gain} as a parameter to measure how many credit user already gain. Net upload gain is a difference between uploaded and downloaded bytes. Moreover, to measure the efficiency of credit mining system, they also defined \textit{normalized upload gain} which is the ratio between \textit{net upload gain} and total downloaded bytes. As an extension of this metric. \todo{add more metrics for comparison}
+\subsection{Comparing performance}
+One checkpoint of this work is comparing the performance of each of the experiments. In the prior work by \citeauthor{2015:creditmining:capota}, they used \textit{net upload gain} as a parameter to measure how many credit user already gain. Net upload gain is a difference between uploaded and downloaded bytes. Moreover, to measure the efficiency of credit mining system, they also defined \textit{normalized upload gain} which is the ratio between \textit{net upload gain} and total downloaded bytes.
 
-The comparison experiment will be run for 12 and 24 hours\todo{may change}. As a note, prior work run its experiment for 2 days (48 hours) straight. Etree.org will be used as mining source because other sources are not compatible with the prior work. It is also not compatible with our experiment framework, gumby, to test in closed environment. The recommended parameter on prior work is by setting credit mining system with SeederRatio policy, target ratio 3, and 5 minute swarm interval although in their argument, setting target ratio as 1 gives higher net upload gain. In our experiment, we will use the same parameter and configuration. We will use this performance of credit mining system as \textit{base performance}. It will then referred from other experiment result. 
+\todo[inline]{add other metric to compare}
 
-The problem with running in the wild is the result may different for each time it was run. If we run the program in parallel, there is a possibility that it will intervene each other. Therefore, we will run the experiment in the following method. First, the experiment will be executed one after another. Our experiment will start first. Then, after it finished, the experiment from prior work will be run immediately. We run the program for 12 hours for both, and then for 24 hours after both of them finished. After all the execution completed, we will run both versions in parallel to find out if it intervenes one another. This phase will run for 12 and 24 hours. If necessary, the experiment will be run several times\todo{may change}. Two approach of interpreting the different results will be applied. First approach is ,we will count the average of the results. Other approach is to see the general trend of the result and pick up the majority as sample. 
-
-\subsubsection{New policy}
-%run same experiment as above but change the seeder ratio with scoring ratio. 
-After knowing the base performance of credit mining system, it is important to keep extending it. By the introduction of our new policy, scoring policy, we intend to compare it to the base performance. In this aspect, we will run two experiment. The first one is the same as previous experiment of etree.org but only change the policy and its parameters. It will be run for both 12 and 24 hours. The result of this experiment will be compared to both prior work and base experiment. 
-
-%run in closed environment. Compare with other policy.
-%The second experiment is executed in closed environment. We will observe both local gain of the miners and global benefit that occurred on the swarm. 
-
+% add download mean
+% add scatter for chooser
 \subsection{Predownload hit capabilities}
+\label{section:predlsetup}
 Credit mining system has many limitations that comes from both resource and libtorrent limitation. Therefore, given a large number of swarms, it is impossible to mine all of them and get good results. Instead, credit mining system measure the swarm before start mining by \textit{predownloading}. However, not all the swarms in the Internet available for predownload. Some swarms are not complete (no one has complete files), only have \textit{webseeds}, and have invalid or duplicate content. This experiment will show how is the prospect of \textit{predownload} in the Internet on a large scale. 
-This experiment to check how is the availability torrent in the net.
 
-In this experiment, we only focused on the \textit{predownload} phase. Therefore, it is tailored to not continue mining with the purpose of accommodating a large amount of swarm we intend to process. Because of this flexibility, we increase the maximum swarm per source by hundredfold and set the active swarm to zero. We comply with the default \textit{predownload} default settings in this experiment. After a swarm has been predownloaded, instead of send it to miners, we retrieve the information and then delete it afterwards. By this approach, the swarm per source slot will be freed faster. 
-
-Still, there is limited time for a swarm to be finished. If the time needed for predownloading is more than 1 hour, we mark it as timeout. In fact, the system will not wait until it finished. It will stop when reaching 1 hour period. If the swarm has not finished until the experiment is finished, then it will be marked as unfinished. This is the case where the predownload activity for that swarm just started in less than 1 hour before experiment finish. Maximum number of swarm in a source also contributing to predownload time. The larger the number, there are more active connection and memory needed for storing the data in a single time. In a sense, it might be possible to affect all of those swarm and make it slower to finish the predownload.
-
-%Current ready : 42 Download only 4 pieces. How long it takes.
-
-After a swarm has been predownloaded, we also observe the peer that has discovered. We put two checkpoints of peer discovery. First is when the swarm just finished predownloading. This is the number of peer that discovered along with the predownloading. Second is after waiting period. This period is designed as a time to gather more information of the swarm. A peer as a Web seed or http seed are excluded from the list. It is possible that there are only some peers in a swarm with finished predownload, but the peer discovered is empty. By doing this, we intend to evaluate the overall predownload period and its timing mechanism. \todo{temp:how many peers discovered}
+In this experiment, we only focused on the \textit{predownload} phase. Therefore, it is tailored to not continue mining with the purpose of accommodating a large amount of swarm we intend to process simultaneously. Because of this flexibility, we increase the maximum swarm per source by hundredfold and set the active swarm to zero. We comply with the default \textit{predownload} default settings in this experiment. After a swarm has been predownloaded, instead of send it to miners, we retrieve the information and then delete it afterwards instead of store it within the miners. By this approach, the swarm per source slot will be freed faster. 
 
 \subsubsection{Torrent crawler}
 For this experiment to be succeed, the large number of swarms needed. Although this can be retrieved from anywhere including illegal swarm, we want to contribute to the society by providing support for the legal one. We implemented legal torrent crawler that can be accessed in \url{https://github.com/ardhipoetra/legal-torrent-crawler}. It uses \textit{scrapy}\footnote{\url{https://scrapy.org/}} as a scraper for the torrent portal sites. The crawler will access those sites, find any link to \texttt{.torrent} file, then download and categorize it. So far, we has implemented for 8 sites as shown in Table \ref{tbl:legaltorrentsource}.
@@ -207,44 +216,19 @@ For this experiment to be succeed, the large number of swarms needed. Although t
 
 The crawler is completely unrelated from credit mining system. It can be executed independently. We first executed the crawler first to collect \texttt{.torrent} file and then put it into one directory. After that, the predownload hit experiment is performed.
 
-\subsection{Experiment on user activity}
-As mentioned in \ref{section:uactivityimpl}, credit mining system that implemented within Tribler need to accommodate user download activity when mining. This experiment validate that feature by evaluating that there is insignificant effect for user. The expectation is that when both credit mining and user download active, the bandwidth used in user download will keep stable. If only credit mining is active, then it will maximize the bandwidth if possible. For the base data as comparison, the download speed without activating credit mining will be averaged.
-
-The experiment will start in closed environment with 10 nodes. In the scenario, we defined three swarms that available for download. As for node categorization, single node act as a publisher, 7 nodes as seeder, the rest are downloaders. One of the downloader activating credit mining and adding our custom RSS feed as its source. We designed the RSS feed that it will feed relatively popular swarm that easy to mine. The download activity will be started first. Credit mining system will be started in several minutes after that. In the middle of scenario, the downloader stop to download one swarm and then switch to another swarm. We will then compare the download speed of one with credit mining active and one without. 
-
-%The Latest try : 42. 
-%Make all credit mining priority as 1 if there is a main activity. Commented out peer logging (reduce size)
-
-\section{Finding best parameters}
-\label{section:cmparamexp}
-The challenge of designing a configurable system is to know what is the effect of the parameters on its performance. Although in the implementation there are many parameters such as the checking period, blacklist threshold and its recovery time, and number of concurrent active swarm in miners, we focused on one that directly related to prospecting method. Therefore, we ended up with two key parameters that need to be evaluated : scoring policy multiplier and the number of downloaded piece in predownload phase.
-
-The experiments in this category will be conducted in both closed environment and the net. In closed environment, we will compare the properties of the swarm observed. The comparison with base performance where credit mining system is not deployed is performed. On the other hand, when launching in the net, custom RSS feed is used. In this case, our focus will be how the credit mining system gain the credit with provided configuration. Both types of experiment run in DAS 4 for 6 hours with 120 nodes. 
-
-\subsection{Multiplier in scoring policy}
-We have mentioned scoring policy in section \ref{section:prospection}. It works by considering swarm properties then gives a score for the properties. There is a weight/multiplier for each properties that stands for its importance. In this experiment we change the multiplier to find out which property and what weight best represent the swarm for prospecting purpose.
-
-We choose the minimum and maximum multiplier by 1 and 5, respectively. In this experiment, a properties is prioritized when the multiplier is 5. On ther other hand, it is not prioritized when the multiplier is 1. Considering there are three properties that need the multiplier, there are six combinations of prioritizing the properties. The algorithm will be executed for every 1 hour. We take note the swarm it choose and compare it to base experiment. The more swarms that selected correctly, the better multiplier combination define the swarm.
-
-\subsection{Number of piece download}
-Another important point of credit mining system is \textit{predownload} phase. By downloading several pieces in start, we put a capital investment hoping that it will act as a mining catalyst. Intuitively, the more capital investment is placed, the higher return will be gained. However, this is not the case in short or medium period. Moreover, another point of \textit{predownload} also to observe peers to get swarm information. Put a large investment on front may become obsolete in next several round.
-
-We start by disabling the predownload, that is, by set zero as number of piece that need to be predownloaded. Next is by set the number as 4, 20, and 50 to represent few, medium, and many piece, respectively. The number of peer and consumed storage are observed. Then, the chosen swarm that relies on the information generated by \textit{predownload} is noted. To have relatively stable number of peer, we will use custom RSS feed to provide us with old but popular content. 
-%\subsection{Peer translation accuracy}
-
-\newpage
-\section{Summary -delete me-}
-\begin{itemize}
-	\item etree RSS: new (seeder ratio) vs mihai's \\
-	12 and 24 hour. Each several times. Net upload gain, share ratio.
-	\item etree RSS: new (scoring policy) vs mihai's\\
-	12 and 24 hour. Net upload gain, share ratio.
-	\item predownload hit\\
-	pie chart (percentage), histogram (time). For peers :histogram (\# peer), pie (just finished \% of end of measurement)
-	\item user activity\\
-	speed graph (x-time, y-speed, line-infohashes). Compare with and without credit mining.
-	\item changing multiplier\\
-	6 experiments. each 6x2=48h
-	\item changing piece predownload\\
-	0,4,20,50. 6h local. 6h old but popular swarm.
-\end{itemize}
+%\newpage
+%\section{Summary -delete me-}
+%\begin{itemize}
+%	\item etree RSS: new (seeder ratio) vs mihai's \\
+%	12 and 24 hour. Each several times. Net upload gain, share ratio.
+%	\item etree RSS: new (scoring policy) vs mihai's\\
+%	12 and 24 hour. Net upload gain, share ratio.
+%	\item predownload hit\\
+%	pie chart (percentage), histogram (time). For peers :histogram (\# peer), pie (just finished \% of end of measurement)
+%	\item user activity\\
+%	speed graph (x-time, y-speed, line-infohashes). Compare with and without credit mining.
+%	\item changing multiplier\\
+%	6 experiments. each 6x2=48h
+%	\item changing piece predownload\\
+%	0,4,20,50. 6h local. 6h old but popular swarm.
+%\end{itemize}
