@@ -1,18 +1,18 @@
 \chapter{Credit mining implementation and experimental setup}
 \label{chp:implexperiment}
-In the previous chapter, we discussed the credit mining system design. The system can be implemented in any language with any interpretation of implementation. In this work, credit mining system implemented in Tribler, a python torrent client that was built in Delft University of Technology. Based on this implementation, we come up with the suitable experiment design to answer our research question in previous chapter. 
+In the previous chapter, we discussed how the credit mining system was designed. In this chapter, we show how credit mining system is implemented in Tribler, a python torrent client that was built in Delft University of Technology. Based on this implementation, we come up with the suitable experiment design to answer our research question in previous chapter. 
 
-This chapter consists of the elaboration of both implementation and its experiment execution plan. First, in section \ref{section:triblerintregration}, we will describe how the credit mining system is implemented within Tribler. As Tribler already had a rule for new system that will be integrated, we addressed those rules. We will also look into the challenges that might be faced if Tribler deploy with credit mining system implemented and discuss the possible solution afterwards. After that, we introduce \textit{gumby} on section \ref{section:gumby}, the experiment runner developed by Tribler team in-house. The section \ref{section:cmexp} will follow to explain the actual experiment execution plan. Section \ref{section:cmparamexp} extend those experiments to an extend which it can be configurable in several points.
+This chapter consists of the elaboration of both implementation and its experiment execution plan. First, in section \ref{section:triblerintregration}, we will describe how the credit mining system is implemented within Tribler. As an open source project, Tribler has a guideline for a new submodule that will be integrated. We comply to that guideline as we will describe later. To evaluate the system, we introduce \textit{gumby} on section \ref{section:gumby}, the experiment runner developed by in-house Tribler team. The section \ref{section:cmexp} will follow to explain the actual experiment setup plan. We will elaborate the environment condition and code alteration regarding the experiment that need to be fulfilled.
 
 \section{Tribler integration}
 \label{section:triblerintregration}
-As a proof of concept, credit mining system was implemented as a module in Tribler. Tribler was built using python, compatible with version 2.x and 3.x. At the time credit mining system implemented in Tribler, Tribler stil use WX as GUI (Graphical User Interface) framework. As for the future, Tribler will move its GUI to use Qt, starting version 7.0 onwards. All of those components made Tribler work cross platform (Linux, MacOS, and Windows).
+As a proof of concept, credit mining system was implemented as a module in Tribler. Tribler was built using python, compatible with version 2.x and 3.x. At the time credit mining system implemented in Tribler, Tribler stil use WX as GUI (Graphical User Interface) framework. As for the future, Tribler will move its GUI to use Qt starting version 7.0 onwards. All of those components made Tribler work cross platform (Linux, MacOS, and Windows).
 
-In the prior work, some of the credit mining system code were implemented by \citeauthor{2015:creditmining:capota} and Egbert Bouman in his Tribler fork\footnote{\url{https://github.com/mihaic/tribler/tree/channel_boosting_new_exp}} instead of the main repository. This made the compatibility and stability between Tribler and credit mining system broke, thus make the system unusable. At this stage, the credit mining code was 1528 line long with 51 deletions.
+In the prior work, some of the credit mining system code were implemented by \citeauthor{2015:creditmining:capota} and Egbert Bouman in his Tribler fork\footnote{\url{https://github.com/mihaic/tribler/tree/channel_boosting_new_exp}} instead of the main repository. This made the compatibility and stability between Tribler and credit mining system broke, thus make the system unusable. At this point, the credit mining code was 1528 line long with 51 deletions compared to main branch.
 
 % implemented in wx for GUI
 \subsection{Contribution on software engineering}
-As part of the software engineering process, the credit mining code need to be pass several steps before merged into main repository. First and foremost, is to open a Pull Request from forked repository to main. In Tribler, there are two main branch : \texttt{devel} for all new features and fixes, and \texttt{next} which contains bug fixes for the stable release. The pull request of first credit mining prototype was directed to \texttt{devel} branch as it is new feature at that point. Next phase is to work on the code itself by committing the work to the pull request. After that, other member of Tribler will review the implementation. One of the review material is the auto test report that executed by Jenkins\footnote{\url{http://jenkins.tribler.org/}}. The peer review process repeated until no other feedbacks. The lead developer will do a final review afterwards. After they gave OK sign, the commits need to be squashed and finally the pull request can be merged. Figure \ref{fig:cmpullrequest} shows the pull request that has been merged into Tribler main repository on \texttt{devel}.
+As part of the software engineering process, the credit mining code need to pass several steps before merged into main repository. In Tribler, there are two main branch, which are \texttt{devel} for all new features and fixes, and \texttt{next} which contains bug fixes for the stable release. The first credit mining prototype was directed to \texttt{devel} branch as it is new feature at that point. Before it can be merged, the code must pass the peer review and unit tests on Jenkins\footnote{\url{http://jenkins.tribler.org/}}. This process is repeated until there is no other feedbacks. As shown in Figure \ref{fig:cmpullrequest}, the first credit mining prototype was heavily discussed by 6 other participants and more than 450 comments. It also takes almost 3 months to accommodate all the feedbacks and reviews. The contributions of this integration worth more than 4200 added lines and 140 deletions. The code portion is quite balanced with 1425 lines goes to GUI part of the code, 1290 lines to the credit mining system itself, 1160 lines to the tests, and the rest to other Tribler components to accommodate credit mining system. At the time of merging it has passed the necessary code coverage and allowed number of violations. Therefore, it confirms that credit mining system can be deployed in all system that supported by Tribler. 
 
 \begin{figure}[h]
 	\centering
@@ -20,81 +20,55 @@ As part of the software engineering process, the credit mining code need to be p
 	\caption[Merged pull request on credit mining prototype]{Merged pull request on credit mining prototype\footnotemark.}
 	\label{fig:cmpullrequest}
 \end{figure}
-
-As shown in Figure \ref{fig:cmpullrequest}, the first credit mining prototype was heavily discussed by 6 other participants and more than 450 comments. It also takes almost 3 months to accommodate all the feedbacks and reviews. The coverage of this integration worth more than 4200 added lines and 140 deletions. The code portion is quite balanced with 1425 lines goes to GUI part of the code, 1290 lines to the credit mining system itself, 1160 lines to the tests, while the rest to other Tribler components to accommodate credit mining system. At the time of merging, credit mining system passed all the necessary test such and able to run in Linux, MacOS, and Windows (both 32 and 64 bit). It passed the necessary code coverage and allowed pylint violations. 
-
-To ensure the quality of the main branch, code submitted through pull request is tested by a unit test mechanism. There are two main category in the credit mining unit tests. First one is the tests that check its basic function. It includes the test of policy, peer translation, RSS parser, similarity function, and mining configuration and its dependencies. It also tests for the unwanted/error case and how credit mining system will respond. The second test is more complex because it emulates the whole credit mining flow. It tests each of the type of mining source (RSS, \textit{channel}, and local directory). For RSS source, the test deployed local server acting as RSS feeder. It also checks how credit mining system behave when RSS source is not exist or temporarily unavailable. As for \textit{channel} source, the test suite prepare the environment by create both local channel and torrent, insert torrent metadata into channel, and push created channel to \textit{AllChannelCommunity}. The test constructed to checks how the system handles when the channel is already in library or not and a situation where number of torrents in channel exceed the maximum number of torrent allowed in the credit mining system. 
-
 \footnotetext{Available in : \url{https://github.com/Tribler/tribler/pull/2064/}}
-\subsection{Experience enhancement}
-\begin{figure}[t]
+
+To ensure the quality of the main branch, code submitted through pull request is tested by a unit test mechanism. There are two categories in the credit mining unit tests. First one is the tests that check its basic function such as policies, peer translation, RSS parser, similarity function, and mining configuration along with its dependencies. It also tests for the unwanted/error case and how credit mining system will react. The second test is more complex because it emulates the whole credit mining flow for each mining source type. For RSS source, the test deployed local server acting as RSS feeder. As for \textit{channel} source, the test suite prepare the environment by creating both local channel and torrent, inserting torrent metadata into channel, and pushing created channel to \textit{AllChannelCommunity}. 
+
+\subsection{Graphical user interface revampment}
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=0.8\textwidth]{pics/old_cm.png}
 	\caption{The GUI for showing information from prior work \cite{2015:creditmining:capota}.}
 	\label{fig:oldcm}
 \end{figure}
+In prior version, it was not possible to add the mining sources except changing from the Tribler configuration file. There are also several limitations such as incompatible source and instability. Figure \ref{fig:oldcm} shows the only interface available from the previous work. As for our work, credit mining main screen shown in \ref{fig:overview}. We improved the investment summary by adding more mining source information. In the same window, we also integrated an interface to easily add or remove mining sources. Adding RSS and directory source can be done by clicking the upper left option. Adding \textit{channel} as a source can be done by put the mark in the check boxes in the channel list. Figure \ref{fig:addsource} shows the example of adding directory source. 
 
-Credit mining system implementation is made publicly available for end user. It is important to encourage user to be as altruistic as possible. Therefore, in this system, we provide minimal interaction so non-altruistic user can be shown the effect of altruism and be convinced that this behavior is beneficial for both parties. In this part, we will elaborate the effort we have done on enhancing user experience of credit mining system on Tribler. As for comparison, Figure \ref{fig:oldcm} shows the only interface available from the previous work. In this version, it was not possible to add the mining sources except from the Tribler configuration file. 
-
-\subsubsection{Graphical user interface revampment}
-Start with the screen we called credit mining main window, it has similar interface compared with previous version. We improved the investment summary by adding more information of the mining source. The investment summary screen contains the swarms download/upload speed, amount of downloaded/uploaded, amount of seeder/leecher, and its identification. Figure \ref{fig:overview} shows this screen. In the same window, we also integrate an interface to easily add or remove mining sources. As mentioned in Section \ref{section:msource}, currently there are only 3 types of sources. Adding RSS and directory source can be done by clicking the upper left option. In the other hand, adding channel source can be done by put the mark in the check boxes in the source list. Figure \ref{fig:addsource} shows the example of adding directory source.
-
-\begin{figure}[t!]
-	\begin{adjustwidth}{-2.5cm}{}
-		\begin{subfigure}[t]{0.6\textwidth}
-			\centering
-			\includegraphics[width=\textwidth, height=6cm]{pics/add_source.png}
-			\caption{The interface of adding mining source.}
-			\label{fig:addsource}
-		\end{subfigure}
-		~
+\begin{figure}[h!]
+	\begin{adjustwidth}{-2.5cm}{-1cm}
 		\begin{subfigure}[t]{0.8\textwidth}
 			\centering
 			\includegraphics[width=\textwidth, height=6cm]{pics/overview_result.png}
 			\caption{The investment overview.}
 			\label{fig:overview}
 		\end{subfigure}
+		~
+		\begin{subfigure}[t]{0.6\textwidth}
+			\centering
+			\includegraphics[width=\textwidth, height=6cm]{pics/add_source.png}
+			\caption{The interface of adding mining source.}
+			\label{fig:addsource}
+		\end{subfigure}
 		\caption{Credit mining main window.}
 	\end{adjustwidth}
 \end{figure}
 
-Credit mining system is disabled by default in Tribler. Because it relates with automatically upload data, it might be concerned with privacy and security issue on end users. Therefore, a user must opt-in to enable credit mining. It can be done by flag the checkbox in Tribler settings window. After enabled, user need to restart Tribler to have the settings take effect. 
+As experimental feature, credit mining system is disabled by default in Tribler. Activating credit mining module made the home screen of Tribler changed. We put several channels sorted by its popularity at the home screen as shown in Figure \ref{fig:homecm}. The purpose is to encourage user to altruistically mine. To show the channel information, we provide two details. First is the popularity, which shown by number of stars. Second is random swarms that resides within a particular channel. User can simply click which channel he want to mine either in this screen or in the credit mining main screen. Both actions will also be reflected in the other screen. 
 
-Activating credit mining module made the home screen of Tribler changed. We put several channels sorted by its popularity at the home screen as shown in Figure \ref{fig:homecm}. Channel is an integral part of Tribler which can be used to disseminate swarm information. This way, Tribler user do not need to leave the application to download new content. In home screen, user can simply click which channel he want to mine. This action will also be reflected in the credit mining main screen. To provide user with sufficient information, the popularity, shown by stars in the channel, and the random swarm that resides within that channel is showed. Moreover, user can also look for channel information if necessary. In this way, Tribler user have an easy access to mine a channel, which we strongly recommend.
-
-\begin{figure}
+\begin{figure}[h]
 	\includegraphics[width=\textwidth]{pics/home_channel.png}
 	\caption{The home interface of Tribler with credit mining active.}
 	\label{fig:homecm}
 \end{figure}
 
-In integrating with Tribler, we emphasize the simplicity to both interact with credit mining system and monitor gained credit. Especially to mine channel, two methods are introduced, both are by single-clicking the checkboxes in home screen (Figure \ref{fig:homecm}) or in credit mining main page (Figure \ref{fig:overview}). Although in the home screen only limited popular channel are shown, in credit mining main page this is not the case. After scrolled some content, if Tribler find another channel that has not been shown, it will append the list with that channel. Basically, it is an infinite list of channel with the upper bound the total number of channel available in Tribler environment. After the channel has been added to credit mining system, user can enable or disable it by another single click.
-
-\subsubsection{User activity awareness}
-\label{section:uactivityimpl}
-One important point to ensure user to keep using any system is to not disturb their activity. In a typical torrent client, non-altruistic user tend to only activate his client when downloading. Although credit mining system runs automatically, it is possible the system will find a potential swarm then actively download from it. For a user with limited bandwidth, we realize this could be a problem if this user realize his bandwidth that currently used is taken by credit mining system. In a long term, this may cause user to disable this system because of the potential intrusiveness. We define the \textit{user download activity} as the activity that intentionally initiated by user in order to participate or download content on the particular swarm. Usually, it is the true purpose of having torrent client. 
-
-\todo{Restructure the following}In response to that issue, on the integration with Tribler, we also implemented another module in credit mining system to adjust its mining activity to user download activity. Credit mining system periodically check whether there is an user downloading activity. If there is not any, then credit mining system can notify the miners to use all the bandwidth available. If there is an activity, user need to set the priority of credit mining download activity. By default, the priority of credit mining download activity will be reduced to one-third\todo{tentative : one-third/3 times}. This means, the swarm in the user download activity will get 3 times higher probability of bandwidth allocation compared to the one in credit mining download activity. The bandwidth distribution is not strictly in order, however, the priority is used as weight for it.
-
-%\subsubsection{Libtorrent tuning}
-%settings in libtorrent to accommodate credit mining <- removed it for now.
-
-%\subsection{Anonymous and secure mining}
-%\todo[inline]{untested. May skip this subsection. See .tex file for draft}
-%Tribler is well known for its anonymity and secure interface on top of \bt~ network. In 2014, Tribler published a specification on its anonymity feature\footnote{\url{https://github.com/Tribler/tribler/wiki/Anonymous-Downloading-and-Streaming-specifications}}. It uses Tor-like onion routing with purely distributed mechanism. A year later, \citeauthor{2015:tunnel:ruigrok} on his work completed the \textit{tunnel community} which emphasize end-to-end encryption in Tribler. This comes with several drawbacks. The most important one is performance degradation. Adding layers of privacy comes with increasing the amount of cryptography operation which slows down end-to-end downloading activity \cite{2015:tunnel:ruigrok}.
-
-% enable safe_seeding: when finished and in 'seeding' state. hops: download/upload via libtorrent proxy.
-
+%\todo[inline]{Add stuff}
 \section{Gumby}
 \label{section:gumby}
-After credit mining system is integrated with Tribler, the next part is to test whether the implementation showing expected result or not. One way to conduct the experiment is by launching Tribler clients in the wild and monitor them using reporting mechanism. Another method is by create several virtual machines and launch Tribler within it. Both approaches are not scalable and very difficult to automatize. Fortunately, in Tribler, there is an experiment runner that can be used to run Tribler in both local machine or cluster to emulate the experiment.
+\textit{Gumby}\footnote{\url{https://github.com/Tribler/gumby}} is an experiment runner framework for both Tribler and Dispersy. Gumby can run in both local computer and cluster computer to emulate the experiment. In this case, we are able to run gumby in DAS4 as part of our experiment. Gumby run on different scenarios, which consists of many commands, for each experiment. It also uses configuration file to define all the settings needed for running the experiment. Developer can easily specify the number of peer needed, the post process script after running the experiment, the value that needed to be distributed to all of the peers, and many others. The most important part is to code the \textit{client} that written in \texttt{python}. In \textit{client} file, one must define how the experiment will run and behave, including the commands interpretation.
 
-\textit{Gumby}\footnote{\url{https://github.com/Tribler/gumby}} is an experiment runner framework for performing in both Tribler and Dispersy. Gumby can run both in local computer and cluster computer. In this case, we able to run gumby in DAS4 and DAS5 (via Jenkins) as part of our experiment. Gumby run on different scenarios that can be specified. It uses configuration file for each experiment to define all the settings needed for one run. Developer can easily specify the number of peer needed for one experiment, the post process script after running experiment, the value that needed to be distributed to all of the peers, and many others. The most important part is to code the experiment code itself written in \texttt{python}. In this file, one must define how the experiment will run and behave. How the commands interpreted also described in this file. There are some functions and classes that need to be extended to make the experiment works.
-
-Gumby run in sequential manner with several steps. The set of steps are different depends on the flag specified in the configuration. But in general, the run is executed as follows. First, gumby read the scenario and configuration file. After deciding what type of experiment it has to run, it will clear the output directory and synchronize it on multiple nodes, in case of running it in cluster computing. Next, the setup script will be executed. It usually contains the experiment requirement that need to be built. After that, it spawns Dispersy and experiment tracker to monitor the experiment in case of error occurred. All of the experiment nodes communicate with server using specified IP and port. Server also expected to exchange messages between nodes whenever needed or specified in the scenario. Finally, both local and remote processes are started in parallel. Upon finishing experiment, server will wait all node instances to exit and disconnect. Then it will copy the data to predefined directory which can be processed using specified post-experiment script to generate items such as graphs and tables.
+Gumby run in sequential manner with several steps as follows. First, gumby reads the scenario and configuration file. After deciding what type of experiment it has to run, it will clear the output directory and synchronize the \textit{client} on multiple nodes, in case of running gumby in cluster computing. Next, the setup script will be executed. After that, gumby spawns Dispersy and experiment tracker to monitor the nodes in case of error occurred. All of the experiment nodes communicate with server using specified IP address and port. Finally, both local and remote processes are started in parallel. Upon finishing experiment, server will wait for all node instances to exit and disconnect gracefully. Then it will copy the data to predefined directory which can be processed using specified post-experiment script to generate items such as graphs and tables.
 
 \subsection{Scenario and Configuration}
-In gumby, it is not possible to intervene the experiment on the fly. What the developer can do is by specifying commands in scenario file. The scenario notation is quite simple. It only needs the time of an action that has to be executed and the command itself. Optionally, which node that run the command can also be specified. Figure \ref{fig:gumbyscenario} shows the example of the aforementioned scenario. For example, command \texttt{@0:36 set\_boost\_settings boosting.ini.1 \{3\}} means in seconds 36, gumby will run command \texttt{set\_boost\_settings} with \texttt{boosting.ini.1} as parameter on node number 3. 
+In gumby, it is not possible to intervene the experiment on the fly. What the developer can do is by specifying commands in scenario file. The scenario notation consists the time of an action and the command itself. Optionally, which node that need to run the command can also be specified with curly brackets. Figure \ref{fig:gumbyscenario} shows the example of the gumby scenario. For example, command \texttt{@0:36 set\_boost\_settings boosting.ini.1 \{3\}} means in seconds 36, gumby will run command \texttt{set\_boost\_settings} with \texttt{boosting.ini.1} as parameter on node number 3. 
 
 \begin{verbbox}
 @0:0 set_master_member 3081a73010...e75
@@ -118,7 +92,7 @@ In gumby, it is not possible to intervene the experiment on the fly. What the de
 	\label{fig:gumbyscenario}
 \end{figure}
 
-With scenario defined as a custom format, on the other hand, gumby configuration file only contains the number of variables that need to be filled. These variables can be accessed from inside the program. Figure \ref{fig:gumbyconf} shows the example of configuration format in gumby. There are some necessary variables such as experiment name and \texttt{tracker\_cmd}. Some of the variables required by specific conditions. For example, if \texttt{local\_instance\_cmd} is \texttt{'das4\_reserve\_and\_run.sh'}, it is necessary to call the other 4 subvariables that recognized by \texttt{das4\_} precedence. Lastly, there are variables that completely optional or needed by the experiment file. In this case, specifying \texttt{scenario\_file} is optional to direct whith scenario we want to run in a single experiment.
+In contrast to scenario file, gumby configuration file only contains a number of variables that need to be filled. These variables can be accessed from inside the \textit{client}. Figure \ref{fig:gumbyconf} shows the example of configuration format in gumby. There are some necessary variables such as experiment name and \texttt{tracker\_cmd}. Some of the variables required by specific conditions. For example, if variable \texttt{local\_instance\_cmd} is \texttt{'das4\_reserve\_and\_run.sh'}, it is necessary to call the other 4 subvariables that recognized by \texttt{das4\_} precedence. There are also variables that completely optional. In this case, specifying variable \texttt{scenario\_file} is optional to point which scenario we want to run.
 
 \begin{verbbox}
 experiment_name = "CreditRunner_base_DAS"
@@ -141,7 +115,8 @@ use_local_venv = True
 scenario_file = "creditmining_base.scenario"
 post_process_cmd = "gumby/scripts/post_credit_mining.sh"
 \end{verbbox}
-\begin{figure}[]
+
+\begin{figure}[h!]
 	\fbox{\theverbbox}
 	\caption{Configuration format example}
 	\label{fig:gumbyconf}
@@ -149,7 +124,7 @@ post_process_cmd = "gumby/scripts/post_credit_mining.sh"
 
 \section{Experimental setup}
 \label{section:cmexp}
-We now focus on how the credit mining system will be evaluated by its performance. In general, there are two aspects we want to address. First one is how credit mining system can gain benefit to its user. This means a user is expected to get considerable amount of credit with small investment. The parameter for this experiment can be derived from how much user actually gain and how it compares to the investment they already had. Second perspective is finding out how the credit mining system can benefit the swarms as a whole. It can be done by monitoring the performance of each of the peers. If each of the peers performance are increasing, then the swarm itself have its capacity increased as well.
+We now focus on how the credit mining system will be evaluated. In general, there are two aspects we want to address. First one is how credit mining system can gain benefit to its user. This means a user is expected to get considerable amount of credit with small investment. The parameter for this experiment can be derived from how much user actually gain and how it compares to the investment they already had. Second perspective is to find out how the credit mining system can benefit the swarms as a whole. It can be done by monitoring the performance of each of the peers. If each of the peers performance are increasing, then the swarm itself have its capacity increased as well.
 
 %\begin{table}[h]
 %	\centering
@@ -173,33 +148,31 @@ We now focus on how the credit mining system will be evaluated by its performanc
 %\end{table}
 
 \subsection{Experiment conditioning}
-The experiments were conducted in different scenario and architecture. For RSS source, we used etree.org (\url{http://bt.etree.org/rss/bt_etree_org.rdf}) and our custom RSS feed. We launced our RSS feed in \url{https://rss-creditmining.herokuapp.com/feeds/}. We put different kinds of swarm there from old but popular to recent but very few peers. Etree.org is a legal community that shares music with permission from authors. This community is relatively active and new published swarm usually has sufficient supply and demand for testing. In the custom RSS feed, we also publish the swarm in different period\todo{Do this}. This approach is important to limit the choice available for credit mining system either from prior or this work. \todo{jenkins, DAS, specification}
+The experiments were conducted in different scenario and architecture. We hand crafted the environment needed for all the experiments. In this thesis, all of the scenarios are presented in the appendix. Most of the experiment conducted in closed environment using \textit{channel} as dissemination method. Swarm with dummy files as a content is created. This swarm then inserted into a particular \textit{Channel}. This \textit{channel} can be accessed from all the nodes using Dispersy. In the end, user can only get the metadata of this swarm such as files information, infohash, and other thing typically found in \texttt{.torrent} file. To be able to compare the system performance to prior work, we used etree.org (\url{http://bt.etree.org/rss/bt_etree_org.rdf}) as mining source. The reason is because prior work's system is not compatible with gumby. Etree.org is a legal community that shares music with permission from authors. This community is relatively active and new published swarm usually has sufficient supply and demand for testing. 
 
-Beside putting the credit mining system in the wild, we also conducted an experiment where we can directly observe the swarm. This can be done in gumby by specifying a number of nodes, mechanism of swarm dissemination, and each of the node's activity. We created a swarm with dummy files as a content. This swarm then inserted into a particular \textit{Channel}. This \textit{channel} can be accessed from all the nodes using Dispersy. In the end, user can only get the metadata of this swarm such as files information, infohash, and other thing typically found in \texttt{.torrent} file. 
+We have two different site to accommodate our experiment. First is DAS-4\footnote{\url{http://www.cs.vu.nl/das4}} (The Distributed ASCI Supercomputer 4) cluster which runs the CentOS Linux operating system. DAS-4 nodes has dual quad-core processor with 24 GB memory. The interconnection speed between nodes is 1Gbit/s. DAS site is used to run experiments that needs a lot of nodes. It has \textit{libtorrent} version 1.1.1 installed. Second site is the local computer named DUTIJC running Arch Linux with \textit{libtorrent} version 1.0.10. This site has 6 GB memory and quad-core \textit{i7-920} processor. DUTIJC site is used for running long experiments. 
 
-In our controlled environment, a node can be categorized as publisher, seeder, downloader, or credit miner. A single node will act as a \textit{publisher} of this swarm. It creates \textit{channel} and dummy files, generates metadata, pushes it into the \textit{channel}, and seed for the rest of the experiment. Another node can help become a seed for the swarm if necessary. It need to copy files related to that swarm into their own directory via unthrottled connection. For other node, it can be either download or activate credit mining system. This \textit{channel} can be added to credit mining system as a mining source. As for downloaders, they can both start and stop downloading from a swarm identified by its name. 
+In our controlled environment, a node can be categorized as publisher, seeder, downloader, or credit miner. A single node will act as a \textit{publisher} of this swarm. It creates \textit{channel} and dummy files, generates metadata, pushes it into the \textit{channel}, and seed for the rest of the experiment. Another node can help become a \textit{seeder} for the swarm if necessary. For other node, it can be either download or activate credit mining system. This \textit{channel} can be added to credit mining system as a mining source. As for \textit{downloaders}, they can both start and stop downloading from a swarm identified by its name. 
 
-\subsection{Comparing performance}
-One checkpoint of this work is comparing the performance of each of the experiments. In the prior work by \citeauthor{2015:creditmining:capota}, they used \textit{net upload gain} as a parameter to measure how many credit user already gain. Net upload gain is a difference between uploaded and downloaded bytes. Moreover, to measure the efficiency of credit mining system, they also defined \textit{normalized upload gain} which is the ratio between \textit{net upload gain} and total downloaded bytes.
+%\subsection{Comparing performance}
+%One checkpoint of this work is comparing the performance of each of the experiments. In the prior work by \citeauthor{2015:creditmining:capota}, they used \textit{net upload gain} as a parameter to measure how many credit user already gain. Net upload gain is a difference between uploaded and downloaded bytes. Moreover, to measure the efficiency of credit mining system, they also defined \textit{normalized upload gain} which is the ratio between \textit{net upload gain} and total downloaded bytes.
+%
+%\todo[inline]{add other metric to compare}
 
-\todo[inline]{add other metric to compare}
-
-% add download mean
-% add scatter for chooser
-\subsection{Predownload hit capabilities}
+\subsection{Code modification for experiments}
 \label{section:predlsetup}
-Credit mining system has many limitations that comes from both resource and libtorrent limitation. Therefore, given a large number of swarms, it is impossible to mine all of them and get good results. Instead, credit mining system measure the swarm before start mining by \textit{predownloading}. However, not all the swarms in the Internet available for predownload. Some swarms are not complete (no one has complete files), only have \textit{webseeds}, and have invalid or duplicate content. This experiment will show how is the prospect of \textit{predownload} in the Internet on a large scale. 
+In this section, we want to focus on assumption and code modification for the experiment in closed environment. As we limit the download and upload rate, we assume the system know this limit. This makes, for example, finding leftover bandwidth trivial. We also defined the multiplier in scoring policy. The value of $M\_leech$, $M\_pratio$, $M\_avail$ are 5, 3, and 4, respectively. The reason behind this number is as follows. We intend to make all multipliers to relatively equal and small. However, it is important to distinguish the features of the policy. The difference between multiplier should not significant such as twice as much as another. $M\_leech$ and $M\_avail$ show the performance shortage in swarms. $M\_leech$ is used in previous work so it has bigger multiplier than $M\_avail$. $M\_pratio$ is a tie-breaker, thus assigned the smallest multiplier.
 
-In this experiment, we only focused on the \textit{predownload} phase. Therefore, it is tailored to not continue mining with the purpose of accommodating a large amount of swarm we intend to process simultaneously. Because of this flexibility, we increase the maximum swarm per source by hundredfold and set the active swarm to zero. We comply with the default \textit{predownload} default settings in this experiment. After a swarm has been predownloaded, instead of send it to miners, we retrieve the information and then delete it afterwards instead of store it within the miners. By this approach, the swarm per source slot will be freed faster. 
+We then altered the code in three occasions. First is the system will aggressively connect to each other. The IP address and port for each nodes are predetermined prior to launch. We use this information to build full mesh connection topology. The second is, any peer information outside the predetermined range is rejected. The third only applied in \textit{predownload} experiment. In this experiment, we increase the maximum swarm per source to one hundred and set the active swarm to zero. Moreover, after a swarm has been \textit{predownloaded}, instead of send it to miners, we retrieve the information and then delete it afterwards. By this approach, the swarm per source slot will be freed faster and the experiment result still valid. 
 
 \subsubsection{Torrent crawler}
-For this experiment to be succeed, the large number of swarms needed. Although this can be retrieved from anywhere including illegal swarm, we want to contribute to the society by providing support for the legal one. We implemented legal torrent crawler that can be accessed in \url{https://github.com/ardhipoetra/legal-torrent-crawler}. It uses \textit{scrapy}\footnote{\url{https://scrapy.org/}} as a scraper for the torrent portal sites. The crawler will access those sites, find any link to \texttt{.torrent} file, then download and categorize it. So far, we has implemented for 8 sites as shown in Table \ref{tbl:legaltorrentsource}.
+For \textit{predownload} experiment to succeed, the large number of swarms are needed. Although many swarms can be retrieved from anywhere including illegal source, we want to contribute to the society by providing support for the legal one. We implemented legal torrent crawler that can be accessed in \url{https://github.com/ardhipoetra/legal-torrent-crawler}. It uses \textit{scrapy}\footnote{\url{https://scrapy.org/}} as a scraper for the torrent portal sites. The crawler will access those sites, find any link to \texttt{.torrent} file, then download and categorize it. So far, we has implemented crawler for 8 sites as shown in Table \ref{tbl:legaltorrentsource}. The crawler is completely unrelated from credit mining system. It can be executed independently. The crawler is executed before \textit{predownload} experiment started. The output of this crawler is \texttt{.torrent} files in a single directory which act as an input for the predownload experiment.
 
 \begin{table}[h]
 	\centering
 	\caption{Legal torrent source.}
 	\label{tbl:legaltorrentsource}
-	\begin{tabular}{lp{9cm}}
+	\begin{tabular}{lp{8.5cm}}
 		\hline
 		Source & Description \\ \hline
 		\url{etree.org} & Live music trading community. \\
@@ -209,26 +182,17 @@ For this experiment to be succeed, the large number of swarms needed. Although t
 		\url{distrowatch.com} & Linux distro torrent aggregator. \\
 		\url{mininova.org} & Torrent directory site. Used to host copyrighted material but now is no more.\\
 		\url{sxswtorrent.com} & Sample music sharing on SXSW events. \\
-		\url{vodo.net} & Media distributor that offers legal films, books, games and music.
-
+		\url{vodo.net} & Media distributor. Offers legal films, books, and music.
 	\end{tabular}
 \end{table}
 
-The crawler is completely unrelated from credit mining system. It can be executed independently. We first executed the crawler first to collect \texttt{.torrent} file and then put it into one directory. After that, the predownload hit experiment is performed.
-
-%\newpage
-%\section{Summary -delete me-}
-%\begin{itemize}
-%	\item etree RSS: new (seeder ratio) vs mihai's \\
-%	12 and 24 hour. Each several times. Net upload gain, share ratio.
-%	\item etree RSS: new (scoring policy) vs mihai's\\
-%	12 and 24 hour. Net upload gain, share ratio.
-%	\item predownload hit\\
-%	pie chart (percentage), histogram (time). For peers :histogram (\# peer), pie (just finished \% of end of measurement)
-%	\item user activity\\
-%	speed graph (x-time, y-speed, line-infohashes). Compare with and without credit mining.
-%	\item changing multiplier\\
-%	6 experiments. each 6x2=48h
-%	\item changing piece predownload\\
-%	0,4,20,50. 6h local. 6h old but popular swarm.
-%\end{itemize}
+%\subsection{Experiment scenarios}
+%\begin{enumerate}
+%	\item simple closed var:policy, num, stimulate
+%	\item prior work comparison
+%	\item predownload. var:policy
+%	\item user activity. 
+%	\item many simple-closed. var. num. stimulate
+%\end{enumerate}
+%
+%\subsection{Parameter for evaluation}
