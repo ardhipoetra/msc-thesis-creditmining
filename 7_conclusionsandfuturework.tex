@@ -2,8 +2,19 @@
 \label{chp:conclusionsandfuturework}
 
 \section{Conclusions}
-TODO CONCLUSIONS
+This thesis aims to solve \bt~supply and demand misalignment introduced by the freeriders. We devised an automatic mechanism to effectively gain credit in the existing credit system. We showed that it benefits both individual and communities. User can gain the credit without need to seed for a long time. The swarms in the community also can get higher download speed and content availability.
+
+We then proposed \textit{credit mining system}, an autonomous system to download pieces from selected swarms in order to gain high upload ratio in the future. It can run on top of traditional credit system that already widely implemented in both private and public communities. Credit mining system finds swarms with high return potential, picks the rarest pieces, and uploads those to the community using all the available bandwidth.
+
+We focus on the prospecting and investment algorithm which is the core of credit mining. Two stage of prospecting were presented. Both stages are important. \textit{Probing} stage filters a huge number of swarm while keep resilience by not depending on centralized tracker. \textit{Mining} stage only selects best swarms that have high gain potential. If necessary, it also stops problematic or low potential swarms. We also proposed \textit{scoring} policy, a highly customizable method to quantify swarms into score that can be compared to each other and reduces possible identical result.
+
+Credit mining system now is fully integrated with Tribler. When enabled, it is tailored to not interfere with users activity on downloading. Provided with accessible GUI, user can easily interact with the system to start investing. Before the system is implemented, it has passed several tests and proved to be stable on cross-platform. All the components designed to not hinder user experience while credit mining system is active.
+
+The performance of credit mining system is fulfilled our expectation. All the components doing their tasks properly. Scoring policy successfully selects the most undersupplied swarms and surpasses previous policy accuracy. Moreover, it also stops both saturated and low potential swarm. With stimulating enabled, most of the time, the system use a large portion (80\%) of its resources. The upload/download ratio can reach up to 4.91 with average 3.71 despite the target was only 2.0. After doing the comparison, current system can gain more credit than in prior work. We also showed that credit miners have a good impact to the community as a whole. With the number of miners is half of the peers, it can boost more than half of swarms in a particular community by up to 29\%. Increasing the number of miners can increase the swarm coverage as well as the average peers download speed.
 
 \section{Future Work}
-The problem of "Co-Investors", when everybody sees the same swarms and does not see others are already boosting them. Thus the need for diversity and awareness of other credit miners.
+Currently, credit miners still sees other miners as normal peer. There might be a case where a miner seeds to another miner, which is unnecessary. The key problem of "Co-Investors" is to recognize and utilize the existence of other miner. With recognizing other miners, investment can be more selective. There is less need to boost a swarm if there are already miners in there, for example. 
 
+Although we proposed the scoring policy in this thesis, the optimal \textit{multipliers} to reach highest gain possible is still unknown. With many parameters, the study to find the weight and importance of those parameters is desired. Furthermore, this policy can be extended by adding more parameters by adopting the same calculation method.
+
+Other aspect that still unknown is whether using different policies for different swarms is beneficial. Currently, the policy can not be changed and all swarms need to comply with single policy. Moreover, as we shown in previous chapter, not all swarms suitable to be stimulated. The \textit{partial mining} mechanism is a method to apply different policies and optimizations to different swarm in order to get highest credit gain possible. 
