@@ -19,7 +19,7 @@ The cardinal problem of knowing a swarm's potential is to obtain reliable swarm 
 		\State \Return \Call{check\_prospect}{$infohash$, $n-1$}
 		\EndFunction
 		
-		\Statex
+%		\Statex
 		\Function{check\_prospect}{$infohash$, $n$}
 		\State $peerlist \gets$ \Call{get\_peers}{$infohash$}
 		\State \Call{add\_to\_peerlib}{$peerlist$}
@@ -49,7 +49,7 @@ The cardinal problem of knowing a swarm's potential is to obtain reliable swarm 
 The pseudocode of the \textit{prospecting} procedure is shown in Algorithm \ref{alg:prospectg}. There are $n$ pieces that need to be downloaded. If it succeeds within a certain threshold, then the swarm has potential. Otherwise, it does not have any potential and is then safe to discard. 
 
 %To be able to join swarms, the pieces that intended to be downloaded need to be stated. 
-To get swarm information, there is a piece that needs to be downloaded. Although any piece will do, we choose only the first piece. Picking the first piece can result in a smaller storage allocation. The system will then look only for $n - 1$ rarest pieces. By finding the rarest pieces, \textit{prospecting} can filter more swarms. Moreover, this method is consistent with the core functions of \bt. While \textit{prospecting}, the system actively asks for new peers to tracker or DHT, and stores them afterwards. The information collected at this stage will be used in the \textit{mining} stage. 
+To get swarm information, there is a piece that needs to be downloaded. Although any piece will do, we choose only the first piece. Picking the first piece can result in a smaller storage allocation. The system will then look for $n - 1$ rarest pieces. By finding the rarest pieces, \textit{prospecting} can filter more swarms. Moreover, this method is consistent with the core functions of \bt. While \textit{prospecting}, the system actively asks for new peers to tracker or DHT, and stores them afterwards. The information collected then will be used in the \textit{mining} stage. 
 
 %Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam vitae consectetur nisl. Praesent at tristique augue, eu blandit nibh. In ornare elit risus, quis lobortis sapien efficitur id. Sed ipsum est, efficitur vitae neque vitae, malesuada lobortis quam. In hac habitasse platea dictumst. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse rutrum leo eu neque luctus, vel venenatis ex suscipit. Nam a nisl sapien. Nam felis nisi, luctus eget porta vel, ullamcorper quis augue. \todo{explain the algo}
 

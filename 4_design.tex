@@ -2,7 +2,7 @@
 \label{chp:design}
 
 % section overview, main components. Libtorrent as dependency. 
-The goal of this thesis is to implement a system which can be used to both gain credit and improve swarm performance. In this thesis, we introduce ``Credit mining system'', an automatic investment framework on the swarm with multidimensional properties. With the credit mining system, a user can gain credit with limited bandwidth allocation without any intervention necessary. We assume the \textit{credit} is the amount of bytes from the system to the community (and vice versa). From a higher perspective, credit mining system will help to keep a swarm alive by providing integral pieces to the peer who might need it. 
+In this thesis, we introduce a ``Credit mining system'', an automatic investment framework that considers multiple properties of the swarms. With the credit mining system, a user can both gain credit and improve swarm performance with limited bandwidth allocation without any intervention necessary. We assume the \textit{credit} is the amount of bytes from the system to the community (and vice versa). From a higher perspective, credit mining system will help to keep a swarm alive by providing integral pieces to the peer who might need it. 
 
 Firstly, the dependencies of the credit mining system, which is \textit{libtorrent}'s s\textit{hare mode}, will be elaborated. \texttt{Share mode} is a module which can be activated with the intent of helping a swarm, instead of normal content downloading. This module will be explained in detail in section \ref{section:sharemode}. After that, the design of the credit mining system is presented. This system consists of several subroutines which will be explained in section \ref{section:cmcomponents}. 
 

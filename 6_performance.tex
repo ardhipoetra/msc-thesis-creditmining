@@ -2,7 +2,7 @@
 \label{chp:perfeval}
 
 This chapter will focus on performance evaluation of the credit mining system implementation in Tribler with both synthetic and real-world swarms. We start with simple and easy to understand experiments with predictable outcomes to validate the correctness of our work. We then increase the complexity of our experiments in several steps towards evaluation within the real Internet environment. We will cover both the core components and proposed optimization. All the experiments in this chapter comply with the specifications mentioned in Section \ref{section:cmexp}. 
-
+\vspace{-0.3cm}
 \section{Evaluation metrics}
 \label{section:evalmetrics}
 Throughout the experiments, we used several metrics to refer the credit mining system evaluation. In order to measure how many credits the user has already gained, \textit{Net upload gain}\cite{2015:creditmining:capota} is used. Net upload gain is defined as the difference between uploaded and downloaded bytes. To show how efficient a miner can get the credit after putting in the investment, \textit{upload ratio} is also used. Upload ratio is the ratio between uploaded and downloaded bytes.
@@ -10,7 +10,7 @@ Throughout the experiments, we used several metrics to refer the credit mining s
 In order to measure whether the miner consumes resources efficiently, both maximum upload and download rate are considered. In most cases, maximum download rate and upload rate is 250 kB/s and 100 kB/s, respectively. We also combine this metric with how frequent a resource is used. For example, a miner that consumes 80\% of the maximum upload rate for 70\% of its lifetime is using the resource more efficiently than another miner that consumes the same amount for only 50\% of its lifetime. A higher number of these metrics means that fewer resources are wasted. 
 
 %We use average download speed in a specific period to measure user experience. However, observed download speed may look unstable because of \bt~nature. Therefore, as long as the measurement difference is not significant, we conclude that user will not experience noticeable performance drops. 
-
+\vspace{-0.3cm}
 %community experience -> download speed average
 \section{Validating the credit mining system}
 \label{section:cmsvalidation}
@@ -45,7 +45,7 @@ In the first experiment, there are only two swarms: \texttt{1gb\_1} and \texttt{
 We intend to run our second experiment with a minimum number of downloaders. Both swarms now have one seeder. The number of downloaders is one for swarm \texttt{1gb\_1} and two  for \texttt{1gb\_2}. We expect the miner to select the swarm with the higher number of downloaders (\texttt{1gb\_2}). In the meantime, the  gained credit and upload ratio will also be observed. The \texttt{share\_mode\_target} is set as one.
 
 Again, the result fits with our expectation. As shown in Figure \ref{fig:val0gain}, the miner correctly chooses undersupplied swarm (\texttt{1gb\_2}). Again, it starts mining after the second selection round. As for credit gain, as shown in Figure \ref{fig:vgain}, the miner get 12.5 MB with 1.99 as upload ratio. This upload ratio result is exceeding our target as specified in \texttt{share\_mode\_target}. 
-
+\vspace{-0.3cm}
 \section{Prospecting hit experiment}
 \label{section:prospectexp}
 The key in prospecting is the ability to find a swarm that is likely to give a high investment return. In the following section, we will asses how well our prospecting algorithm can discard low-potential swarms on the Internet. Furthermore, we will also measure how fast and accurate the prospecting algorithm can find high-potential swarms. 
@@ -68,63 +68,63 @@ In this experiment, 1 swarm is inserted for every 7 seconds until the maximum am
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=0.6\textwidth]{pics/results/hpredown.pdf}
+	\includegraphics[width=0.7\textwidth]{pics/results/hpredown.pdf}
 	\caption{Prospecting distributed time}
 	\label{fig:predownhist}
 \end{figure}
 
 In the Figure \ref{fig:predownprecent}, the portion of swarm that has been successfully \textit{prospected} is shown. Out of 13956 observed swarms, 3690 swarms have a very small file size. This left us with 10266 swarms with 45\% finished, 25\% timed out, and 20\% with zero peers. Figure \ref{fig:predownhist} shows the distribution of time needed to download 4 of the rarest pieces on successfully prospected swarms (4623 swarms). Most of the swarms can be prospected in less than 2 minutes. The average time is 514 seconds, and the 90\% percentile relies in 1440 seconds as shown in vertical blue and red line, respectively. By looking at this figure, the ideal threshold time should be around 30 minutes instead of 60 minutes. We arrived at this conclusion since, in less than 30 minutes, 90\% of the successfully \textit{prospected} swarm is finished.
 
-Now, we compare the result to both the \textit{random} and \textit{sequential} method. Figure \ref{fig:predownprecent} shows that the number of swarms that are successfully prospected has increased significantly in both methods. The top and bottom part of the figure represents the random and sequential method, respectively. Both approaches are resulting in 0 for attempted failure swarm. This fact clarifies that most of the swarms in this experiment are alive. However, some of them do not have any downloaders at the time of the experiment, thus making them inactive. The proposed method can safely discard those swarms as they are not suitable for investing. By discarding 54\% of the swarms, it filters 70\% and 160\% more than the random and sequential method, respectively. Moreover, its behavior is compatible with \bt~piece policy. Just after prospecting is finished, the upload ratio may be very high because the pieces we collected are prioritized to be uploaded as shown in the previous experiment.
+Now, we compare the result to both the \textit{random} and \textit{sequential} method. Figure \ref{fig:predownprecent} shows that the number of swarms that are successfully prospected has increased significantly in both methods. The top and bottom part of the figure represents the random and sequential method, respectively. Both approaches are resulting in 0 for attempted failure swarm. This fact clarifies that most of the swarms in this experiment are alive. However, some of them do not have any downloaders at the time of the experiment, thus making them inactive. The proposed method can safely discard those swarms as they are not suitable for investing. By discarding 54\% of the swarms, it filters 70\% and 160\% more than the random and sequential method, respectively. Also, its behavior is compatible with \bt~piece policy. Just after prospecting is finished, the upload ratio may be very high because the pieces we collected are prioritized to be uploaded as shown in the previous experiment.
 
 \subsection{Finding undersupplied swarms}
 In the following section, the speed and accuracy of the prospecting algorithm to find undersupplied swarms will be evaluated. The experiments are conducted in a closed environment and have a single community containing many swarms. Each swarm has 2 seeders and 1 downloader, except for a few swarms, which only have 1 seeder. We denote the number of undersupplied swarms as a percentage of all the swarms in the community. The maximum number of concurrent swarm for active prospecting is 30. The maximum number of active swarms for mining is the same as the number of expected undersupplied swarms. The experiments only consider seeder and leecher ratio in the \textit{scoring} policy. Figure \ref{fig:timeprosexp} shows the time results with various portion of undersupplied swarms and community size. The black dot is the moment when the miner discovers the swarm. The blue, red, and green lines are the elapsed time for the miner when waiting for prospecting, prospecting, and mining, respectively.
 
 \begin{figure}[th]
-	\begin{adjustwidth}{-1.5cm}{}
-	\begin{subfigure}[t]{0.6\textwidth}
+%	\begin{adjustwidth}{-1.5cm}{}
+%	\begin{subfigure}[t]{0.6\textwidth}
+%		\centering
+%		\includegraphics[width=\textwidth]{pics/results/time-1p100s.pdf}
+%		\caption{Investing timeline for 1\% of 100 swarm.}
+%		\label{fig:time1p100s}
+%	\end{subfigure}
+%	~
+%	\begin{subfigure}[t]{0.6\textwidth}
+%		\centering
+%		\includegraphics[width=\textwidth]{pics/results/time-5p100s.pdf}
+%		\caption{Investing timeline for 5\% of 100 swarm.}
+%		\label{fig:time5p100s}
+%	\end{subfigure}
+%	\begin{subfigure}[t]{0.6\textwidth}
+%		\centering
+%		\includegraphics[width=\textwidth]{pics/results/time-1p200s.pdf}
+%		\caption{Investing timeline for 1\% of 200 swarm.}
+%		\label{fig:time1p200s}
+%	\end{subfigure}
+%	~
+%	\begin{subfigure}[t]{0.6\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{pics/results/time-1p100s.pdf}
-		\caption{Investing timeline for 1\% of 100 swarm.}
-		\label{fig:time1p100s}
-	\end{subfigure}
-	~
-	\begin{subfigure}[t]{0.6\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{pics/results/time-5p100s.pdf}
-		\caption{Investing timeline for 5\% of 100 swarm.}
-		\label{fig:time5p100s}
-	\end{subfigure}
-	\begin{subfigure}[t]{0.6\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{pics/results/time-1p200s.pdf}
-		\caption{Investing timeline for 1\% of 200 swarm.}
-		\label{fig:time1p200s}
-	\end{subfigure}
-	~
-	\begin{subfigure}[t]{0.6\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{pics/results/time-25p200s.pdf}
-		\caption{Investing timeline for 2.5\% of 200 swarm.}
-		\label{fig:time2p200s}
-	\end{subfigure}
+		\includegraphics[width=0.8\textwidth]{pics/results/time-merge.pdf}
+%		\caption{Investing timeline for 2.5\% of 200 swarm.}
+%		\label{fig:time2p200s}
+%	\end{subfigure}
 	\caption{Investing timeline results.}
 	\label{fig:timeprosexp}
-\end{adjustwidth}
+%\end{adjustwidth}
 \end{figure}
 
-The first experiment shown in Figure \ref{fig:time1p100s} has 1 undersupplied swarm (1\%) out of 100 swarms. The miner needs 34 minutes before it can start mining this swarm, mainly caused by the waiting phase (88\%). The prospecting results an accurate swarm choice because in the \textit{mining} phase, the miner continuously selects the targeted swarm until its downloader has finished downloading. In the next experiment, the number of undersupplied swarms is increased to 5\% and its result is shown in Figure \ref{fig:time5p100s}. Likewise, the prospecting accuracy is equally accurate. However, swarm waiting time and late discovery hold back the miner from mining all of the targeted swarms. The average time of waiting and prospecting are 20 and 4.4 minutes, respectively. Moreover, \texttt{swarm4} was discovered very late on the 50th minute.
+The first experiment shown at the top of Figure \ref{fig:timeprosexp} has 1 undersupplied swarm (1\%) out of 100 swarms. The miner needs 34 minutes before it can start mining this swarm, mainly caused by the waiting phase (88\%). The prospecting results an accurate swarm choice because in the \textit{mining} phase, the miner continuously selects the targeted swarm until its downloader has finished downloading. In the next experiment, the number of undersupplied swarms is increased to 5\% and its result is shown in second row of Figure \ref{fig:timeprosexp}. Likewise, the prospecting accuracy is equally accurate. However, swarm waiting time and late discovery hold back the miner from mining all of the targeted swarms. The average time of waiting and prospecting are 20 and 4.4 minutes, respectively. Moreover, \texttt{swarm4} was discovered very late on the 50th minute.
 
-Next, we changed the community size to 200. Figure \ref{fig:time1p200s} and Figure \ref{fig:time2p200s} shows the result for 1\% (2 swarms) and 5 swarms (2.5\%) for an undersupplied swarm, respectively. For 5 underseeded swarms, the average prospecting time and waiting are 4.6 and 7 minutes, respectively. The \textit{mining} phase that starts regularly every 5 minutes causes the gap between the \textit{prospecting} and \textit{mining} phase. The accuracy of this experiment is similar to the previous one. There is also a swarm that was discovered very late which holds the miner to mine all of the underseeded swarms.
+Next, we changed the community size to 200. We show the the result for 1\% (2 swarms) and 2.5\% (5 swarms) for an undersupplied swarm. For 5 underseeded swarms, the average prospecting time and waiting are 4.6 and 7 minutes, respectively. The \textit{mining} phase that starts regularly every 5 minutes causes the gap between the \textit{prospecting} and \textit{mining} phase. The accuracy of this experiment is similar to the previous one. There is also a swarm that was discovered very late which holds the miner to mine all of the underseeded swarms.
 
 From these results, we can draw several conclusions. First, provided sufficient information, the prospecting algorithm is both fast and accurate. It only takes around 4-5 minutes which is much lower compared to both waiting and mining time. In general, its accuracy makes the \textit{mining} phase does not need to switch to other swarms. Second, waiting time and late discovery are the main causes that restrict the miner from starting to mine all of the undersupplied swarms as early as possible. Waiting time may be reduced by increasing the maximum number of concurrent prospecting swarms or by changing the prospecting queue system. Late discovery time is introduced by an external factor, which in this case, is the swarm dissemination method by \textit{channel} in Tribler. 
 %In one case, even some targeted swarms could not be discovered because of this problem. Ideally, swarms should be discovered regularly in short interval. 
-
+\vspace{-0.3cm}
 \section{Evaluating Scoring policy}
 \label{section:evalscoring}
 In the following experiments, the \textit{mining} stage as part of our investing algorithm is evaluated. We focus on the \textit{scoring} policy that is used in swarm selection. We wish to show that this policy selects the undersupplied swarms correctly. Furthermore, the mining performance from this selection will be evaluated. We will confirm that our policy results in a positive upload gain and ratio. 
 
-The experiments were run for three hours to compare \textit{scoring} and \textit{seederratio} policy. There are 10 swarms, and each has the same content size. Each swarm has a various number of seeders and a fixed number of 5 downloaders. A single credit miner should select the underseeded swarms without relying on tracker or DHT. The credit mining system actively chooses at most 3 of these swarms to mine at a time. We set \texttt{share\_mode\_target} as 2. In the experiment, we use the \textit{peer translation} function to interpret the number of seeders and leechers in a swarm. 
+The experiments were run for three hours to compare \textit{scoring} and \textit{seederratio} policy. There are 10 swarms, and each has the same content size. Each swarm has a various number of seeders and a fixed number of 5 downloaders. For example, swarm \texttt{file1gb\_4} has 4 seeders and 1 GB content size. A single credit miner then should select the underseeded swarms without relying on tracker or DHT. Thus, the \textit{peer translation} function is activated. The credit mining system actively chooses at most 3 of these swarms to mine at a time. We set \texttt{share\_mode\_target} as 2.
 
 \subsection{The selected swarms}
 In this section, we focus on what swarm the policy chooses. Two communities are presented. One is the community where there are a different number of seeders and leechers for all the swarms, and with equal content size. Another community is the opposite, i.e. different content sizes with equal peers. \textit{Scoring} policy should perform equally with \textit{seederratio} policy in the first community. For the second community, the \textit{scoring} policy is expected to outperform \textit{seederratio} policy. We will specifically focus on the top three swarms that need to be seeded.
@@ -139,18 +139,18 @@ In this section, we focus on what swarm the policy chooses. Two communities are 
 
 Regarding the first community, Figure \ref{fig:scatterscsrnotrig} shows which swarms the policies select. Focusing on the three targeted swarms, they are chosen for 79\% and 89\% for scoring policy and seeder ratio policy, respectively. At the beginning of the experiment (timestep 0-2500), the lack of information causes peer translation function to be less accurate. However, as the time goes on, more information can be collected, swarm information is stabilized, and both policy and peer translation function become more accurate. When the current swarm is saturated, the effect is inverted. The information of other swarms become very outdated and causes both policy and peer translation function to have inaccurate results. The system has to rejoin other swarms to fetch the latest information. That explains the policy choice dispersion in the last 40 minutes (2500 seconds) near the end. 
 
-\begin{figure}[b!]
+\begin{figure}[th!]
 	\begin{adjustwidth}{-1.5cm}{}
 		\begin{subfigure}[t]{0.6\textwidth}
 			\centering
-			\includegraphics[width=\textwidth]{pics/results/sc10_density.pdf}
+			\includegraphics[width=\textwidth]{pics/results/sc10_bar.pdf}
 			\caption{Scoring ratio swarm selection with 10 miners.}
 			\label{fig:scattersc10}
 		\end{subfigure}
 		~
 		\begin{subfigure}[t]{0.6\textwidth}
 			\centering
-			\includegraphics[width=\textwidth]{pics/results/scmulti_density.pdf}
+			\includegraphics[width=\textwidth]{pics/results/scmulti_bar.pdf}
 			\caption{Swarm selection on swarms with different content size.}
 			\label{fig:scatterscmulti}
 		\end{subfigure}
@@ -160,7 +160,7 @@ Regarding the first community, Figure \ref{fig:scatterscsrnotrig} shows which sw
 
 The policy is still valid when there is more than one miner in the community. To support this argument, we conducted a similar experiment with 10 credit miners with the scoring policy. Shown in Figure \ref{fig:scattersc10}, the miners still choose the first three lowest-seeded swarms for the 80\% of the experiment. 
 
-Figure \ref{fig:scatterscmulti} shows what the policies choose in the community with different file size among the swarms. For each policy, we conducted 3 experiments with only a single miner each. From the result, the scoring policy mainly chooses swarms with a large file. On the contrary, in seeder ratio, it frequently chooses other swarms as well. A swarm that has large files will have slower completion rate on its peers compared to one that has small files. Slower completion rate also means there are more rare pieces in a swarm, hence low piece availability. In this experiment, the target swarms are \texttt{file5gb}, \texttt{file3gb}, and \texttt{file2.5gb}. Scoring policy correctly detects the piece shortage problem and addresses it by choosing the swarm with the lowest piece availability. From the three targeted swarms, scoring policy chooses 82\%. On the other hand, the seeder ratio sees all the swarm as equal, and the behavior is unpredictable. It chooses 67\% of the three targeted swarms.
+Figure \ref{fig:scatterscmulti} shows what the policies choose in the community with different file size among the swarms. For each policy, we conducted 3 experiments with only a single miner each. From the result, the scoring policy mainly chooses swarms with a large file. On the contrary, in seeder ratio, it frequently chooses other swarms as well. A swarm that has large files will have slower completion rate on its peers compared to one that has small files. Slower completion rate also means there are more rare pieces in a swarm, hence low piece availability. In this experiment, the target swarms are \texttt{file5gb}, \texttt{file3gb}, and \texttt{file2.5gb}. Scoring policy correctly detects the piece shortage problem and addresses it by choosing the swarm with the lowest piece availability. From the three targeted swarms, scoring policy chooses 82\%. On the other hand, the seeder ratio sees all the swarm as equal, and the behavior is unpredictable. It only chooses 67\% of the three targeted swarms.
 
 \subsection{Obtained gain by the selection}
 \label{section:resultgain}
@@ -168,9 +168,16 @@ The following results are presented to determine the actual gain obtained as a r
 
 %By its nature, credit mining system only able to control what swarm to choose and how long the mining in one session is. After a swarm has been chosen, \textit{libtorrent} with its \textit{share mode} will do the rest. This causes slightly different results in each experiment. However, if the swarm selection constantly chooses a particular swarm, we expect the trend to be similar. 
 
+The obtained gain of applying the seeder ratio policy is shown in Figure \ref{fig:simplesrnotrig}. A swarm with 2 seeders (\texttt{file1gb\_2}) is dominating the result. The rest of the selected swarms are relatively constant most of the time. Swarm \texttt{file1gb\_2} average seeding speed is 61 kB/s, which is more than half of the maximum speed on a single peer. This swarm also used a significant resource, which is more than 80\% of the maximum upload rate, for 44.67\% of its lifetime. At the end of the experiment, it reaches 241 MB gain and 2.005 upload ratio. As a comparison, the average upload ratio is 2.650.
+
 \begin{figure}[h!]
 	\begin{adjustwidth}{-1.5cm}{}
+		\begin{subfigure}[t]{1.2\textwidth}
+			\centering
+			\includegraphics[width=0.8\textwidth]{pics/results/legends.eps}
+		\end{subfigure}
 		\begin{subfigure}[t]{0.6\textwidth}
+			\vspace{-0.5cm}
 			\centering
 			\includegraphics[width=\textwidth]{pics/results/simple1_sr_notrig.pdf}
 			\caption{Seeder ratio policy gain.}
@@ -178,6 +185,7 @@ The following results are presented to determine the actual gain obtained as a r
 		\end{subfigure}
 		~
 		\begin{subfigure}[t]{0.6\textwidth}
+			\vspace{-0.5cm}
 			\centering
 			\includegraphics[width=\textwidth]{pics/results/simple1_scsr_notrig.pdf}
 			\caption{Scoring policy gain.}
@@ -187,25 +195,29 @@ The following results are presented to determine the actual gain obtained as a r
 	\end{adjustwidth}
 \end{figure} 
 
-The obtained gain of applying the seeder ratio policy is shown in Figure \ref{fig:simplesrnotrig}. A swarm with 2 seeders (\texttt{file1gb\_2}) is dominating the result. The rest of the selected swarms are relatively constant most of the time. Swarm \texttt{file1gb\_2} average seeding speed is 61 kB/s, which is more than half of the maximum speed on a single peer. This swarm also used a significant resource, which is more than 80\% of the maximum upload rate, for 44.67\% of its lifetime. At the end of the experiment, it reaches 241 MB gain and 2.005 upload ratio. As a comparison, the average upload ratio is 2.650.
-
 In Figure \ref{fig:simplescsrnotrig}, the scoring policy is applied. Unsurprisingly, the trend is similar. This time, the gain is 538 MB, almost twice that of the seeder policy with the same swarm.  Although \texttt{file1gb\_2} returned the highest gain, its upload ratio is not the highest at only 2.99.  The highest ratio is returned by \texttt{file1gb\_7} at 4.91, and the average from all the swarms is 3.718. Average upload speed for this swarm is 94.4 kB/s with 90\% of the observation taking more than 80\% of the maximum upload rate. By these results, it is clear that the factor that limits the credit mining system obtaining higher gain is the maximum upload rate. 
 
 After we observed those, we come to three conclusions. First, our hypothesis about the similar choice in this particular experiment on both of the policies is proved to be correct. Although the gain is significantly different, it was not directly caused by the mining system. Instead, it is part of the \bt~protocol, one that builds up the download and upload speed. Second, although the resource may be used to its full capacity as shown in Figure \ref{fig:simplescsrnotrig}, it is entirely possible that it is not used efficiently. This is shown by the inactivity from the other swarms. Net upload gain for other swarms is barely increased in both cases. This locked-up condition is caused by the \textit{libtorrent}'s \textit{share mode} algorithm and its cause and possible solutions already discussed in Section \ref{section:sharemode}. Third, the swarm that gets the highest net upload gain does not necessarily have the highest ratio. We believe that this is caused by the prospecting mechanism that downloads only a few of the rarest pieces and then uploads those pieces to most of the peers. After downloading these rarest pieces, some of the swarms are not chosen by policy. Therefore, the ratio remains high because there is no downloading activity.
 
 \subsubsection{The effect of stimulating swarms}
-With swarm stimulation, inactive swarms tend to gain more credits when mined. Figure \ref{fig:simplesrtrig} shows the case for seeder ratio policy and Figure \ref{fig:simplescsrtrig} for scoring policy. We specifically focus on swarm \texttt{file1gb\_1} and \texttt{file1gb\_3} because they are the most affected swarms by stimulation mechanism. Table \ref{tbl:stimul} shows the stimulation effect of those swarms.
+With swarm stimulation, \textit{stale} swarms tend to gain more credits when mined. Figure \ref{fig:simplesrtrig} shows the case for seeder ratio policy and Figure \ref{fig:simplescsrtrig} for scoring policy. We specifically focus on swarm \texttt{file1gb\_1} and \texttt{file1gb\_3} because they are the most affected swarms by stimulation mechanism. Table \ref{tbl:stimul} shows the stimulation effect of those swarms.
 
 \begin{figure}[h]
 	\begin{adjustwidth}{-1.5cm}{}
-		\begin{subfigure}[t]{0.6\textwidth}
+		\begin{subfigure}[t]{1.2\textwidth}
+			\centering
+			\includegraphics[width=0.8\textwidth]{pics/results/legends.eps}
+		\end{subfigure}
+		\begin{subfigure}[b]{0.6\textwidth}
+			\vspace{-0.2cm}
 			\centering
 			\includegraphics[width=\textwidth]{pics/results/simple3_sr_trig.pdf}
 			\caption{Seeder ratio policy gain with stimulation enabled.}
 			\label{fig:simplesrtrig}
 		\end{subfigure}
 		~
-		\begin{subfigure}[t]{0.6\textwidth}
+		\begin{subfigure}[b]{0.6\textwidth}
+			\vspace{-0.2cm}
 			\centering
 			\includegraphics[width=\textwidth]{pics/results/simple1_scsr_trig.pdf}
 			\caption{Scoring policy gain with stimulation enabled.}
@@ -232,13 +244,16 @@ With swarm stimulation, inactive swarms tend to gain more credits when mined. Fi
 \end{adjustwidth}
 \end{table}
 
-Compared to previous results, inactive swarms have  their performance increased. From the figure, we can see many bumps that lead to the increasing amount of gain. The total stimulant of each swarm is 20, 12, and 12 for \texttt{file1gb\_1}, \texttt{file1gb\_2}, and \texttt{file1gb\_3}, respectively. Also, both upload ratio and net upload gain are significantly increased. This result is in line with our expectations. On the contrary, in scoring policy, the effect of stimulation is not significant. Although upload gain is increased, the ratio is similar to that of when stimulation was disabled. This happened because in the previous experiment with scoring policy, most of the resource was already in use. Therefore, we conclude that swarm stimulation works best when the resource in a miner is not fully used, and there are idle swarms in the community.
+Compared to previous results, stale swarms have  their performance increased. From the figure, many bumps that lead to the increasing amount of gain are spotted. In seeder ratio policy, the total stimulant of each swarm is 20 and 12 for \texttt{file1gb\_1} and \texttt{file1gb\_3}, respectively. Also, both upload ratio and net upload gain are significantly increased. This result is in line with our expectations. On the contrary, in scoring policy, the effect of stimulation is not significant. Although upload gain is increased, the ratio is similar to that of when stimulation was disabled. This happened because in the previous scoring policy experiment, most of the resource was already in use. Therefore, we conclude that swarm stimulation works best when the resource in a miner is not fully used, and there are idle swarms in the community.
 
 % 100 swarm for 12, 24. 500 swarm for 24h
+\vspace{-0.3cm} 
 \section{Comparing obtained gain with prior work}
-In this experiment, we will evaluate the result of the proposed system compared to prior work. The comparison experiment run for 24 hours. \textit{Etree.org} will be used as the mining source because the prior version could neither handle other sources nor use the experiment framework in a closed environment. The recommended parameter on the prior work is \textit{SeederRatio} as policy, target ratio is 3, and a 5 minute swarm interval. The result will be shown in Figure \ref{fig:oldetree24}.
+In this experiment, we will evaluate the result of the proposed system compared to prior work. The comparison experiment run separately for 24 hours on 9 and 10 December 2016 for the prior work and current work, respectively. \textit{Etree.org} will be used as the mining source because the prior version could neither handle other sources nor use the experiment framework in a closed environment. The recommended parameter on the prior work is \textit{SeederRatio} as policy, target ratio is 3, and a 5 minute swarm interval. The result will be shown in Figure \ref{fig:oldetree24}.
 
-For the proposed system, we applied the scoring policy with stimulation enabled. The other parameters and configuration will be kept identical with that of the prior work. The result will then be compared to the prior work. Figure \ref{fig:newetree24} shows the result of the proposed system. Note that the axis that represents net upload gain in both results is logarithmic.
+For the proposed system, we applied the scoring policy with stimulation enabled. The other parameters and configuration will be kept identical with that of the prior work. The result will then be compared to the prior work. We expect that more credit will be gained in this system compared to the prior's one. Figure \ref{fig:newetree24} shows the result of the proposed system. 
+
+%Note that the axis that represents net upload gain in both results is logarithmic.
 
 \begin{figure}[h]
 	\begin{adjustwidth}{-1.5cm}{}
@@ -255,36 +270,55 @@ For the proposed system, we applied the scoring policy with stimulation enabled.
 			\caption{24 hour old experiment}
 			\label{fig:oldetree24}
 		\end{subfigure}
-		\caption{New vs old experiments (run separately) result on 24 hour (\textit{seederratio} policy)}
+		\caption{New vs old experiments result for 24 hour.}
 	\end{adjustwidth}
 \end{figure}
-%\todo{re-run with updated code} 
-From the figures presented, we can find one similarity. Both of the systems are dominated by only a few swarms. It means that not all of the recent swarms are popular. A popular swarm means that it has more leechers, which impacts the overall credit gain. For the main difference, we found two aspects that show that the new credit mining system is better: policy stability and reducing idleness. In the new system, thanks to the investment algorithm, the miners do not need to unnecessarily switch swarms. It shows that the lines tend to be more continuous compared to ones in prior work. When the line is invisible, it means that the particular swarm was not selected in this round. Secondly, it is the idleness of a swarm which is represented in straight horizontal line in the figures. We can successfully reduce the idle swarm by enabling stimulation. In the experiment of the proposed system, when net upload gained is more than 500 MB, none of the swarms are idle. On the contrary, some swarms in prior work are idle, even when their upload gain is already high. It can be seen in three straight horizontal lines above the 1000 MB gain.
 
- 
+The total net upload gain from the prior work is reached 8971 MB. In the other hand, our system can reach 45470 MB as total net upload gain. This shows that with all the features enabled, our system can gain more credits than prior work's. However, we find one similarity. Both of the systems are dominated by only a few swarms. It means that not all of the recent swarms are popular. A popular swarm usually has more leechers, which impacts the overall credit gain. For the main difference, we found two aspects that show that the new credit mining system is better: policy stability and reducing idleness. In the new system, thanks to the investment algorithm, the miners do not need to unnecessarily switch swarms. It shows that the lines tend to be more continuous compared to ones in prior work. When the line is invisible, it means that the particular swarm was not selected in this round. Secondly, it is the idleness of a swarm which is represented in straight horizontal line in the figures. The idle swarm is successfully reduced by enabling stimulation. In the experiment of the proposed system, when net upload gained is more than 500 MB, none of the swarms are idle. On the contrary, some swarms in prior work are idle, even when their upload gain is already high. It can be seen in three straight horizontal lines above the 1000 MB gain.
+
+\vspace{-0.3cm} 
 \section{Sustaining user experience on downloading}
 \label{section:expprio}
 As mentioned in \ref{section:uactivityimpl}, the credit mining system that is implemented within Tribler needs to accommodate user download activity when mining. This experiment will validate that feature. The expectation is that when both credit mining and user download is active, the bandwidth used in user download will remain stable. If only credit mining is active, then the system will maximize the bandwidth if possible. 
 
-The experiment runs in the environment as follows. We launched 40 peers and 4 swarms in a single community. One of the swarms contains a file with size 1 GB and rest of the swarms have a 2 GB file. Each swarm has 4 dedicated seeders. We then arbitrarily decide the number of downloaders for each swarm. All of the peers have credit mining disabled except the one in which we have our interest. This peer activates the credit mining system early, without any user download activity. In the middle of the experiment, this peer intentionally downloads a swarm outside of the credit mining system. We will then observe the behavior of our implementation on this event based on the peer's perspective. As for comparison, we launch a similar experiment but the peer mentioned above does not activate credit mining system. 
+The experiment runs in the environment as follows. We launched 40 peers and 4 swarms in a single community. One of the swarms contains a file with size 1 GB and rest of the swarms have a 2 GB file. Each swarm has 4 dedicated seeders. We then arbitrarily decide the number of downloaders for each swarm. All of the peers have credit mining disabled except the one in which we have our interest. 
 
+At the start, the observed peer activates the credit mining system. In minute 25 of the experiment, this peer intentionally downloads one of the swarm that has 2 GB file size. We call this swarm as the \textit{target} swarm. Then, at minute 120, new peers join the targeted swarm. We will then observe the behavior of our implementation from the peer's perspective. As for comparison, we launch a similar experiment but the observed peer does not activate credit mining system. 
+
+\vspace{-0.4cm}
 \begin{figure}[h!]
-%	\begin{subfigure}[t]{\textwidth}
+	
+	\begin{subfigure}{\textwidth}
+		\includegraphics[width=\textwidth]{pics/results/legends-prio.pdf}
+	\end{subfigure}
+	\begin{subfigure}{0.6\textwidth}
+		\vspace{-0.65cm}
+		\includegraphics[width=\textwidth]{pics/results/legends-prio2.eps}
+	\end{subfigure}
+%	\begin{adjustwidth}{-1.5cm}{}
+	
+	\begin{subfigure}{0.9\textwidth}
+		\vspace{-0.2cm}
 		\centering
-		\includegraphics[width=\textwidth]{pics/results/pr_g2-act2.pdf}
-		\caption{Download speed of user download activity.}
-		\label{fig:cmprio}
+		\includegraphics[width=\textwidth]{pics/results/pr_g2-act2_cpl2.pdf}
+	\end{subfigure}
+%	\end{adjustwidth}
+	\vspace{-0.2cm}
+	\caption{Download speed of user download activity.}
+	\label{fig:cmprio}
 \end{figure}
 
-The results in Figure \ref{fig:cmprio} show the download speed on selected peers with and without activating credit mining. The line which shows user download activity is colored as blue and green. The blue line is run on the experiment with credit mining, while the green line is on the experiment without it. We find that the results match our expectations regarding bandwidth distribution. Before the new batch of peers arrived to download, both findings resulted in similar speed constantly in the 150-170 kB/s range. After the new batch of peers arrived, the speed reached up to 150 kB/s for both cases. We conclude that credit mining system has a negligible effect on the overall user experience. 
+The result in Figure \ref{fig:cmprio} shows the download speed on observed peers. The blue and green line shows user download activity with and without activating credit mining, respectively. Before the new batch of peers arrive, both findings resulted in similar speed constantly in the 150-170 kB/s range. After the new batch of peers arrived (as shown by black vertical line), the speed reaches up to 150 kB/s for both cases. The results match with our expectation that credit mining system has a negligible effect on the overall user experience. 
 
-In Figure \ref{fig:cmprio}, the red line is shown as the accumulative download speed for all of the mined swarms. At first, the mining speed is quite high by reaching 125 kB/s. After the user promptly downloads a particular swarm, the speed is adjusted to around 45 kB/s. Totaling both mining and downloading activity results, the speed is more than 200 kB/s, which is 80\% of the total download bandwidth. Sometimes, the mining speed is 0. This is when the observation phase occurred as elaborated in Section \ref{section:uactivityimpl}. Although not obvious, the general trend of user download and mining speed is contradictory. This can be observable in between timestamp 2500s and 5000s. When the user download speed increased, the credit mining system adjusted its mining speed by allocating lower bandwidth. This allocation method is also valid in the opposite manner, which is when the download speed is decreasing. All of these results show that the credit mining system is able to run with unused bandwidth. 
+In the same Figure, the red line is shown as the accumulative download speed for all of the mined swarms except the targeted swarm. Before the user promptly downloads a particular swarm, the mining speed reaches 129 kB/s. After that, it is adjusted to 20-45 kB/s. Totaling both mining and downloading activity download speed resulting more than 200 kB/s, which is 80\% of the total download bandwidth. 
 
+Sometimes, the mining speed is 0 because the credit mining system is in the observation period. In this period, as shown as gray-colored area, the average user activity download speed, as shown with black dots, is examined. Moreover, the mining download limit is marked by red dots. From the results, the trend of user download and mining speed is contradictory. When the user download speed is increased, the credit mining system adjusts its mining speed by allocating lower bandwidth, as shown in the first to second pair of dots. This is also valid in the opposite manner, which is when the download speed is decreased. These results show that the credit mining system is able to run and to adapt with unused bandwidth. 
+\vspace{-0.3cm} 
 \section{Swarm performance with credit mining}
 \label{section:swperf}
-After we confidently get a high return gain from the previous results, it is worth finding out what are the effects of credit mining implementation on the community. The experiment runs with the same setting as in the Section \ref{section:evalscoring}, except we add more than one miner. We also use the scoring policy as default, and enable the stimulation. The other parameters are left default. 
+After we confidently get a high return gain from the previous results, it is worth finding out what are the effects of credit mining implementation on the community. We expect that credit mining system will increase the swarm's performance. The experiments run with the similar setup and setting as in the Section \ref{section:evalscoring}, except that now we add more than one miner. We also use the scoring policy as default, and enable the swarm stimulation mechanism. The other parameters are left default. 
 
-Figure \ref{fig:swarmnocmperf} shows the average download speed of all of the members in each of the swarm. In this experiment, no credit mining systems are active. Some of the swarms have reached their maximum download speed such as \texttt{file1gb\_8}, \texttt{file1gb\_9}, and \texttt{file1gb\_10}. We will take this result as a base figure for the next experiment.
+Figure \ref{fig:swarmnocmperf} shows the average download speed from all of the peers in each of the swarm. In this experiment, no credit mining systems are active. The peers of some of the high-seeded swarms, such as \texttt{file1gb\_8}, \texttt{file1gb\_9}, and \texttt{file1}- -\texttt{gb\_10}, have already reached their maximum download speed. For comparison purpose, we will take this result as a base result in the next experiments.
 
 \begin{figure}[h]
 	\centering
@@ -314,7 +348,7 @@ Figure \ref{fig:swarmnocmperf} shows the average download speed of all of the me
 %10  exp_3h_swperf_simple_file1gb_9 231.35478 232.65703 -0.5597267
 %2  exp_3h_swperf_simple_file1gb_10 231.79176 233.83902 -0.8754966
 
-Next, we will introduce the credit mining system in the swarms. We start by spawning credit mining system for half of the number of downloaders, which is 25 nodes. Those are dedicated miners, and all of them started simultaneously. Figure \ref{fig:swarmcm25perf} shows the average download speed from all the downloaders for each of the swarms. We define the swarm as \textit{covered} by credit mining if the performance is significantly either increased or dropped, i.e. by more than 5\%. In this experiment, the credit mining covers swarms from \texttt{1gb\_2} to \texttt{1gb\_5}. Compared to the previous experiment without credit mining, the download speed is increased from 18.3\% (\texttt{1gb\_4}) to 29.8\% (swarm \texttt{1gb\_2}). For an unaffected swarm, the speed can decrease up to 0.8\%.
+Next, we will introduce the credit mining system in the swarms. We start by spawning credit mining system for half of the number of downloaders, which is 25 nodes. Those are dedicated miners that started simultaneously. Figure \ref{fig:swarmcm25perf} shows the average download speed from all the downloaders for each of the swarms. We define the swarm as \textit{covered} by the credit mining if the performance is significantly either increased or dropped, i.e. by more than 5\%. In this experiment, the credit mining covers swarms from \texttt{1gb\_2} to \texttt{1gb\_5}. Compared to the experiment without credit mining, the download speed is increased by at least 18.3\% (\texttt{1gb\_4}) to 29.8\% (swarm \texttt{1gb\_2}). For an unaffected swarm, the speed can decrease up to 0.8\%.
 
 \begin{figure}[h!]
 	\centering
@@ -334,12 +368,16 @@ Next, we will introduce the credit mining system in the swarms. We start by spaw
 	%	2  231.79176 exp_3h_swperf_simple_file1gb_10
 \end{figure}
 
-There are two notable drawbacks when introducing the credit mining system to the swarm, one of which is that the download speed has become unstable. This occurs because of two reasons. First, because of swarm stimulation, there is a higher chance for the miners to become more active on downloading pieces. Second, when switching to a new swarm, miners have incomplete information on the rarest pieces. Therefore, they need to download those pieces to be able to mine. Both reasons are intended to maximize the upload gain as soon as possible. When the miner downloads any piece, it takes the seeder's bandwidth and then observes that the speed for other peers looks like decreasing. These factors combined explains the instability in the Figure \ref{fig:swarmcm25perf}.
+There are two notable drawbacks when introducing the credit mining system to the swarm, one of which is that the download speed has become unstable. This occurs because of two reasons. First, because of swarm stimulation, there is a higher chance for the miners to become more active on downloading pieces. Second, when switching to a new swarm, miners have incomplete peers information. Therefore, they need to download new pieces to be able to mine. Both reasons are intended to maximize the upload gain. When the miner downloads any piece, it takes the seeder's bandwidth. Therefore, the download speed for other downloaders is decreasing. These factors combined explains the occurrence of instability.
 
-The second drawback is the fact that not all the swarms are boosted by the system. The swarms with a high number of seeders starting from \texttt{1gb\_6} to \texttt{1gb\_10} are not boosted in half of the experiment. With the way miners prioritize the swarms, only the lowest-seeded swarm will be filled with miners. In other words, there are not enough miners to boost all of the swarms in this experiment. Note that the lowest number of seeders gives a worse performance than the base experiment. The reason is that the miner takes the seeder's bandwidth that is supposed to be the downloader's. Therefore, some of the downloaders get lower speeds. However, miners can not give back its downloaded pieces to all downloaders. Thus the observed speed is decreasing. In other words, the bottleneck is on the seeder's bandwidth because the seeder cannot deliver the piece fast enough for the miners to distribute the pieces efficiently.
+The second drawback is the fact that not all the swarms are boosted by the system. The swarms with a high number of seeders such as swarm \texttt{1gb\_6} and \texttt{1gb\_7} are not boosted. With the way miners prioritize the swarms, only the lowest-seeded swarm will be filled with miners. In other words, there are not enough miners to boost all of the swarms in this experiment.
 
+% Note that the lowest number of seeders gives a worse performance than the base experiment. The reason is that the miner takes the seeder's bandwidth that is supposed to be the downloader's. Because of that, the downloaders get lower speeds. However, miners cannot give back its downloaded pieces to all downloaders in time. In other words, the bottleneck is on the seeder's bandwidth because the seeder cannot deliver the piece fast enough for the miners to distribute the pieces efficiently.
+\vspace{-0.3cm} 
 \subsection{Varying the number of credit miners}
-In this experiment, we will change the number of credit miners in a swarm. First, we double the number to 50 nodes. The average download speed observed from peers can be seen in Figure \ref{fig:swarmcmperf}. Although the download instability is still present, not only the speed is faster than the previous experiment with 25 miners, but also it overcomes the second drawback. Compared to the previous experiment, this shows that the number of miners relates to the boosting coverage of swarms. With 50 miners, it is enough to cover all the possible swarms in this environment. The exceptional case of the swarm with a single seeder still holds. Moreover, with 50 swarms, it can increase the swarm's download speed up to 34.6\% (swarm \texttt{1gb\_3}). The lowest increasing performance is on swarm \texttt{1gb\_7} with 3.9\%. The average increase for the covered swarm is 17.98\%.
+In this experiment, we will change the number of credit miners in a community. First, we double the number to 50 nodes. The average downloaders' download speed can be seen in Figure \ref{fig:swarmcmperf}. Although the download instability is still present, not only the speed is faster than the 25-miners experiment, but also it overcomes the second drawback. Compared to the previous experiment, this shows that the number of miners relates to the boosting coverage of swarms. With 50 miners, it is enough to cover all the possible swarms in this community. Moreover, it also increases the swarm's performance up to 34.6\% (swarm \texttt{1gb\_3}). The lowest and average increasing performance is 3.9\% (swarm \texttt{1gb\_7}) and 17.98\%, respectively.
+
+%The exceptional case of the swarm with a single seeder still holds. 
 
 \begin{figure}[h]
 	\begin{subfigure}[h]{\textwidth}
@@ -379,7 +417,7 @@ In this experiment, we will change the number of credit miners in a swarm. First
 	\caption{The effect of different number of miners on swarm.}
 \end{figure}
 
-Second, we also conducted an experiment with fewer miners. In this case, the number of credit miners in the swarm is set to 10 nodes. From Figure \ref{fig:swarmcm10perf}, it is shown that the coverage is lessened. Now, half of the swarms (from \texttt{1gb\_5} to \texttt{1gb\_10}) are not boosted by the miners. The average speed is slightly higher than that of the base experiment, but lower than the 25-miners experiment. The highest performance increase is on swarm \texttt{1gb\_2} with 20.5\%, and the lowest is on \texttt{1gb\_4} with 8.21\%.
+Second, we also conducted an experiment with fewer miners. In this case, the number of credit miners is set to 10 nodes. From Figure \ref{fig:swarmcm10perf}, it is shown that the coverage is lessened. Now, more swarms (from \texttt{1gb\_5} to \texttt{1gb\_10}) are not boosted by the miners. The average speed is slightly higher than that of the base experiment, but lower than the 25-miners experiment. The highest performance increase is on the swarm \texttt{1gb\_2} with 20.5\%, and the lowest is on the swarm \texttt{1gb\_4} with 8.21\%. This emphasizes the positive relation between the number of miners, boosting coverage, and swarms' performance.
 
 
 \subsection{The effect of swarm stimulation}
@@ -401,7 +439,9 @@ Second, we also conducted an experiment with fewer miners. In this case, the num
 	%	2  232.99496 file1gb_10
 \end{figure}
 
-Our next experiment is conducted to understand the effect of swarm stimulation on the community. As shown before (Section \ref{section:resultgain}), swarm stimulation can increase the credit gain for the user. A notable difference from this experiment is that the average speed instability is gone, as can be seen in Figure \ref{fig:swarmcm25perfnotrig}. However, as a trade-off, the average speed is slightly lower on the boosted swarm. Compared to the experiment with 25 miners, only swarm \texttt{1gb\_4} is better with 8\% increased download speed. The rest have their performance decreased starting from 1\% (\texttt{file1gb\_5}) to 17\% (\texttt{file1gb\_2}) . Even so, it is still better than the base experiment. Swarm \texttt{file1gb\_4} improves as much as 28\% and swarm \texttt{file1gb\_2}, despite having the worst decreasing performance when compared to the one with 25-miners, still improves by 7.25\%. Other disadvantages are on the lower-seeded swarm, namely \texttt{1gb\_1} and \texttt{1gb\_2}, which has negligible difference compared to the base experiment, especially in the latter half of the experiment. Therefore, the coverage of the boosted swarm is also reduced. 
+Our next experiment is conducted to understand the effect of swarm stimulation on the community. As shown before (in Section \ref{section:resultgain}), swarm stimulation can increase the credit gain for the user. A notable difference from this experiment is that the average speed instability is gone, as can be seen in Figure \ref{fig:swarmcm25perfnotrig}. However, as a trade-off, the average speed is slightly lower on the boosted swarm. Compared to the 25-miners experiment, only swarm \texttt{1gb\_4} is better with 8\% increased download speed. The rest have their performance decreased starting from 1\% (\texttt{file1gb\_5}) to 17\% (\texttt{file1gb\_2}). Even so, it is still better than the base experiment. Swarm \texttt{file1gb\_4} improves as much as 28\%, and swarm \texttt{file1gb\_2} still improves by 7.25\%. Another disadvantage is that on the lower-seeded swarms, namely \texttt{1gb\_1} and \texttt{1gb\_2}, they have negligible difference compared to the base experiment's, especially in the latter half of the experiment. Therefore, the coverage of the boosted swarm is also reduced because of the existence of stale swarms. 
 
-When swarm stimulation is enabled, it will consume the bandwidth from both the seeder and downloader if necessary. After it finishes downloading rarest pieces, it immediately returns the bandwidth it consumed back to the community in an equal or higher amount. That explains the bumps which represented instability of the downloaders' download speed. However, we argue that stimulate swarm with very few seeders is counterproductive. Although the stimulation can be widely enabled on all the swarms which gives very little drawback, it seems to be unsuitable for some swarms. 
+Swarm stimulation is the major cause of the instability of the peers' download speed. When it is active, it will consume the bandwidth from
+all the peers. Thus, the swarm performance is decreasing. After it finishes downloading the pieces, it will increase the swarm performance by immediately returning the bandwidth it consumed back to the swarms in an equal or higher amount. We also find that stimulating swarm on a very few seeders is counterproductive. Compared to 25-miners experiment, only the performance for \texttt{1gb\_4} and  \texttt{1gb\_5} are equal or increased. From the community's perspective, swarm stimulation mechanism seems to negate the benefits of credit mining system for some swarms.
 
+%However, we argue that stimulate swarm with very few seeders is counterproductive. Although the stimulation can be widely enabled on all the swarms which gives very little drawback, it seems to be unsuitable for some swarms. 
