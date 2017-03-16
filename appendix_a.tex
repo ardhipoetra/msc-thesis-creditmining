@@ -2,9 +2,28 @@
 \chapter{Experiment scenarios}
 \label{app:expscenario}
 
-In this appendix, we present the scenario files used for the experiments. There are 4 main scenarios in total. \textit{Scenario 1} is used in Section \ref{section:chooseswarmexp}. It has single miner for the experiment. \textit{Scenario 2} is used not only in Section \ref{section:chooseswarmexp} but also in Section \ref{section:swperf}. The number of miner can be changed by adding more nodes. In this case, we specify it as 25 miners. \textit{Scenario 3} is used in Section \ref{section:chooseswarmexp} to show swarms with multiple level of availability. This can be done by specifying different file sizes that reside within swarms. The miner is active in node number 101.  Lastly, \textit{Scenario 4} is used in Section \ref{section:expprio}. It specifies the experiment to check user experience in downloading while activating credit mining system. The miner is active in node number 40. 
+In this appendix, we present the scenario files used for the experiments. There are 5 main scenarios in total. The first scenario, \textit{Scenario 1}, consists our validation experiment as stated in Section \ref{section:cmsvalidation}. \textit{Scenario 2} is used in Section \ref{section:chooseswarmexp}. It has single miner for the experiment. \textit{Scenario 3} is used not only in Section \ref{section:chooseswarmexp} but also in Section \ref{section:swperf}. The number of miner can be changed by adding more nodes. In this case, we specify it as 25 miners. \textit{Scenario 4} is used in Section \ref{section:chooseswarmexp} to show swarms with multiple level of availability. This can be done by specifying different file sizes that reside within swarms. The miner is active in node number 101.  Lastly, \textit{Scenario 5} is used in Section \ref{section:expprio}. It specifies the experiment to check user experience in downloading while activating credit mining system. The miner is active in node number 40. 
 
 \begin{lstlisting}[caption={Scenario 1.}]
+@0:0 set_master_member 307e....5177
+@0:2 start_dispersy {1-6}
+@0:20 start_session
+@0:30 online
+@0:30 reset_dispersy_statistics
+@0:30 annotate start-experiment
+@0:30 create {1}
+@0:42 publish file1gb_1 1524288001 {1}
+@0:61 join {2-5}
+@0:65 publish file1gb_2 1524288002 {3}
+@0:71 setup_seeder file1gb_2 1524288002 {4}
+@5:0 set_boost_settings boosting.ini.1 {5}
+@5:2 start_boosting {5}
+@5:3 add_source joinedchannel {5}
+@58:0 reset_dispersy_statistics
+@59:0 stop
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Scenario 2.}]
 @0:0 set_master_member 307e....5177
 @0:2 start_dispersy {1-106}
 @0:20 start_session
@@ -105,7 +124,7 @@ In this appendix, we present the scenario files used for the experiments. There 
 @2:59:0 stop
 \end{lstlisting}
 
-\begin{lstlisting}[caption={Scenario 3.}]
+\begin{lstlisting}[caption={Scenario 4.}]
 @0:0 set_master_member 307e....5177
 @0:2 start_dispersy {1-101}
 @0:20 start_session
@@ -156,7 +175,7 @@ In this appendix, we present the scenario files used for the experiments. There 
 @2:59:0 stop
 \end{lstlisting}
 
-\begin{lstlisting}[caption={Scenario 4.}]
+\begin{lstlisting}[caption={Scenario 5.}]
 @0:0 set_master_member 307e....5177
 @0:2 start_dispersy {1-40}
 @0:10 start_session
